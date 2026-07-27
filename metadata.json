@@ -1,0 +1,6 @@
+{
+  "name": "مؤسسة الأخوة للحدايد والبويات",
+  "description": "منصة التجارة المتكاملة وإدارة المتاجر ولوحة تحكم المالك لمؤسسة الأخوة للحدايد والبويات",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
