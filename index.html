@@ -325,23 +325,21 @@
         /* Mobile Mobile First Responsive Precision Styles */
         @media (max-width: 575.98px) {
             .main-header {
-                padding: 6px 10px !important;
+                padding: 6px 8px !important;
             }
             #orgBrandTitle {
-                max-width: 135px;
-                font-size: 0.82rem !important;
+                max-width: none !important;
+                font-size: clamp(0.75rem, 3.2vw, 0.95rem) !important;
+                white-space: nowrap !important;
+                overflow: visible !important;
             }
-            #userNavName {
-                max-width: 85px;
-                display: inline-block;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                vertical-align: middle;
-                font-size: 0.75rem;
+            #userHeaderAccountBtn {
+                width: 34px !important;
+                height: 34px !important;
+                min-width: 34px !important;
             }
             .main-header .btn-sm {
-                padding: 4px 7px !important;
+                padding: 4px 6px !important;
                 font-size: 0.75rem !important;
             }
             .main-header .btn-sm i {
@@ -445,12 +443,12 @@
     <!-- الهيدر العلوي الرئيسي -->
     <header class="main-header py-1 py-sm-2 px-2 px-sm-3 sticky-top">
         <div class="d-flex align-items-center justify-content-between flex-nowrap">
-            <div class="d-flex align-items-center gap-1 gap-sm-2 overflow-hidden flex-shrink-1 me-1">
+            <div class="d-flex align-items-center gap-1 gap-sm-2 flex-shrink-1 me-1 overflow-visible">
                 <button class="btn btn-outline-light border-0 p-1 p-sm-2 flex-shrink-0" id="sidebarToggleBtn" onclick="toggleSidebar()">
                     <i class="fa-solid fa-bars fs-6 fs-sm-5"></i>
                 </button>
-                <div class="brand-clickable text-white fw-bold fs-6 fs-md-5 text-truncate" id="orgBrandTitle" onclick="handleOwnerBrandClick()">
-                    <i class="fa-solid fa-cubes text-warning me-1"></i>
+                <div class="brand-clickable text-white fw-bold fs-6 fs-md-5 d-flex align-items-center" id="orgBrandTitle" onclick="handleOwnerBrandClick()" style="white-space: nowrap;">
+                    <i class="fa-solid fa-cubes text-warning me-1 flex-shrink-0"></i>
                     <span id="headerStoreName">مؤسسة الاخوة للحدايد والبويات</span>
                 </div>
             </div>
@@ -464,8 +462,9 @@
                     <span class="d-none d-sm-inline ms-1">السلة</span>
                     <span id="cartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
                 </button>
-                <button class="btn btn-outline-light btn-sm d-inline-flex align-items-center gap-1 fw-bold px-1 px-sm-2 px-md-3 shadow-sm" onclick="openUserModal()" title="حساب العميل وأرشيف الفواتير">
-                    <span id="userNavName"><i class="fa-solid fa-user me-1"></i> حسابي / تسجيل</span>
+                <button class="btn btn-outline-light btn-sm rounded-circle p-0 d-inline-flex align-items-center justify-content-center shadow-sm position-relative flex-shrink-0" id="userHeaderAccountBtn" onclick="openUserModal()" title="حساب العميل وتفاصيل الحساب" style="width: 36px; height: 36px; min-width: 36px;">
+                    <i class="fa-solid fa-circle-user fs-4 text-warning" id="userHeaderIcon"></i>
+                    <span id="userNavName" class="d-none">حسابي</span>
                 </button>
                 <button class="btn btn-warning btn-sm fw-bold py-1 px-2" id="exitVendorBtn" style="display:none;" onclick="logoutVendor()">
                     <i class="fa-solid fa-right-from-bracket me-1"></i> خروج التاجر
@@ -616,8 +615,9 @@
                                 </div>
                                 <div class="col-md-7 d-flex flex-column justify-content-between">
                                     <div>
-                                        <h4 id="detailTitle" class="fw-bold text-dark"></h4>
+                                        <h4 id="detailTitle" class="fw-bold text-dark mb-1"></h4>
                                         <p class="text-muted mb-2 small">القسم الرئيسي: <span id="detailCategory" class="badge bg-primary"></span> | القسم الفرعي: <span id="detailSubCategory" class="badge bg-info text-dark"></span></p>
+                                        <div class="d-flex align-items-center gap-2 mb-2" id="detailRatingBadge"></div>
                                         <div class="mb-3">
                                             <span id="detailPrice" class="fs-2 fw-bold text-success"></span>
                                             <span id="detailOldPrice" class="text-decoration-line-through text-muted ms-2"></span>
@@ -628,6 +628,55 @@
                                     <button id="detailAddToCartBtn" class="btn btn-primary btn-lg w-100 fw-bold mt-3">
                                         <i class="fa-solid fa-cart-plus me-2"></i> إضافة للسلة
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- قسم تقييمات وآراء العملاء بالنجوم -->
+                        <div class="card p-3 p-md-4 shadow-sm border rounded mb-4">
+                            <h5 class="fw-bold text-dark border-bottom pb-2 mb-3 d-flex align-items-center justify-content-between">
+                                <span><i class="fa-solid fa-star text-warning me-2"></i> تقييمات وآراء العملاء لهذا المنتج</span>
+                                <span class="badge bg-warning text-dark fs-6" id="detailAvgRatingHeaderBadge">5.0 / 5</span>
+                            </h5>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-5 border-end-md">
+                                    <div class="bg-light p-3 rounded text-center mb-3 border">
+                                        <h2 class="fw-bold text-dark mb-0 fs-1" id="detailAvgRatingScore">5.0</h2>
+                                        <div id="detailAvgRatingStars" class="fs-5 my-1"></div>
+                                        <small class="text-muted d-block fw-bold" id="detailRatingCountText">بناءً على 1 تقييم</small>
+                                    </div>
+                                    
+                                    <div class="p-3 bg-light rounded border">
+                                        <h6 class="fw-bold mb-2 text-dark"><i class="fa-solid fa-pen-to-square me-1 text-primary"></i> أضف تقييمك بالنجوم للمنتج:</h6>
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-bold mb-1">اختر التقييم بالنجوم (1 إلى 5):</label>
+                                            <div class="star-rating-input d-flex gap-2 fs-3 text-warning py-1" id="interactiveStarPicker" style="cursor: pointer;">
+                                                <i class="fa-solid fa-star" data-star="1" onclick="selectStarRating(1)"></i>
+                                                <i class="fa-solid fa-star" data-star="2" onclick="selectStarRating(2)"></i>
+                                                <i class="fa-solid fa-star" data-star="3" onclick="selectStarRating(3)"></i>
+                                                <i class="fa-solid fa-star" data-star="4" onclick="selectStarRating(4)"></i>
+                                                <i class="fa-solid fa-star" data-star="5" onclick="selectStarRating(5)"></i>
+                                            </div>
+                                            <input type="hidden" id="selectedStarValue" value="5">
+                                        </div>
+                                        <div class="mb-2">
+                                            <input type="text" id="raterNameInput" class="form-control form-control-sm" placeholder="اسمك الكريم (اختياري)...">
+                                        </div>
+                                        <div class="mb-2">
+                                            <textarea id="raterCommentInput" class="form-control form-control-sm" rows="2" placeholder="اكتب تعليقك ورأيك في المنتج..."></textarea>
+                                        </div>
+                                        <button class="btn btn-warning btn-sm w-100 fw-bold shadow-sm" onclick="submitProductRating()">
+                                            <i class="fa-solid fa-paper-plane me-1"></i> إرسال التقييم الآن
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-7">
+                                    <h6 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-comments me-1 text-info"></i> آراء العملاء السابقة:</h6>
+                                    <div id="productReviewsListContainer" style="max-height: 290px; overflow-y: auto;">
+                                        <!-- تم ملؤها ديناميكياً بآراء العملاء -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -666,11 +715,8 @@
                                     <a href="javascript:void(0)" onclick="alert('شروط الخدمة: المنصة تتيح للتاجر نشر المنتجات وإدارة المبيعات وفق اشتراك شهري محدد.')">الشروط والخصوصية</a>
                                 </div>
 
-                                <!-- القسم الثالث: التواصل و حقوق الملكية -->
+                                <!-- القسم الثالث: حقوق الملكية -->
                                 <div class="d-flex align-items-center gap-2">
-                                    <a href="https://wa.me/201029190615" id="footerWhatsappBtn" target="_blank" class="btn btn-outline-success btn-sm py-1 px-2 fw-bold" style="font-size:0.75rem;">
-                                        <i class="fa-brands fa-whatsapp me-1"></i> واتساب المبيعات
-                                    </a>
                                     <span id="footerRightsDisplay" class="text-muted ms-2" style="font-size:0.75rem;">حقوق الملكية وتطوير المنصة الرقمية © Mohamed Nazih (01029190615)</span>
                                 </div>
 
@@ -876,6 +922,12 @@
                                     <input type="number" id="pDiscountPrice" class="form-control" step="0.01" min="0" placeholder="مثال: 420 (اتركه فارغاً إن لم يوجد خصم)">
                                 </div>
                                 <div class="col-12">
+                                    <div class="form-check form-switch bg-light p-2 ps-5 rounded border mb-2">
+                                        <input class="form-check-input" type="checkbox" id="pIsPopular">
+                                        <label class="form-check-label fw-bold text-dark" for="pIsPopular">
+                                            <i class="fa-solid fa-fire text-danger me-1"></i> إظهار في شريط المنتجات الأكثر طلباً (الشريط العلوي)
+                                        </label>
+                                    </div>
                                     <div class="form-check form-switch bg-light p-2 ps-5 rounded border">
                                         <input class="form-check-input" type="checkbox" id="pIsCompetitive">
                                         <label class="form-check-label fw-bold text-dark" for="pIsCompetitive">
@@ -1125,6 +1177,12 @@
                                 <input type="text" id="vProdUnit" class="form-control" placeholder="مثال: بستلة 10 لتر">
                             </div>
                             <div class="col-12">
+                                <div class="form-check form-switch bg-white p-2 ps-5 rounded border mb-2">
+                                    <input class="form-check-input" type="checkbox" id="vProdIsPopular">
+                                    <label class="form-check-label fw-bold text-dark" for="vProdIsPopular">
+                                        <i class="fa-solid fa-fire text-danger me-1"></i> إظهار في شريط المنتجات الأكثر طلباً (الشريط العلوي)
+                                    </label>
+                                </div>
                                 <div class="form-check form-switch bg-white p-2 ps-5 rounded border">
                                     <input class="form-check-input" type="checkbox" id="vProdIsCompetitive">
                                     <label class="form-check-label fw-bold text-dark" for="vProdIsCompetitive">
@@ -2045,6 +2103,7 @@
         function resetVendorProductForm() {
             document.getElementById('vProdEditId').value = '';
             document.getElementById('vendorProductForm').reset();
+            if(document.getElementById('vProdIsPopular')) document.getElementById('vProdIsPopular').checked = false;
             if(document.getElementById('vProdIsCompetitive')) document.getElementById('vProdIsCompetitive').checked = false;
             populateVendorCategorySelects();
         }
@@ -2064,6 +2123,7 @@
             const discountPrice = (discInput && discInput.value !== '') ? parseFloat(discInput.value) : null;
 
             const unit = document.getElementById('vProdUnit') ? document.getElementById('vProdUnit').value.trim() : '';
+            const isPopular = document.getElementById('vProdIsPopular') ? document.getElementById('vProdIsPopular').checked : false;
             const isCompetitive = document.getElementById('vProdIsCompetitive') ? document.getElementById('vProdIsCompetitive').checked : false;
             const imageUrl = (document.getElementById('vProdImageUrl') && document.getElementById('vProdImageUrl').value.trim()) || 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500';
             const desc = document.getElementById('vProdDesc') ? document.getElementById('vProdDesc').value.trim() : '';
@@ -2074,6 +2134,7 @@
                     products[prodIndex] = {
                         ...products[prodIndex],
                         title, category, subCategory, price, costPrice, discountPrice, stock: 999, usage: unit, desc,
+                        isPopular,
                         isCompetitive,
                         images: [imageUrl]
                     };
@@ -2084,6 +2145,7 @@
                     id: Date.now(),
                     tenantId: currentVendor.id,
                     title, category, subCategory, price, costPrice, discountPrice, stock: 999, usage: unit, desc,
+                    isPopular,
                     isCompetitive,
                     images: [imageUrl]
                 };
@@ -2114,6 +2176,7 @@
                 document.getElementById('vProdDiscountPrice').value = (p.discountPrice !== undefined && p.discountPrice !== null) ? p.discountPrice : '';
             }
             if(document.getElementById('vProdUnit')) document.getElementById('vProdUnit').value = p.usage || '';
+            if(document.getElementById('vProdIsPopular')) document.getElementById('vProdIsPopular').checked = !!p.isPopular;
             if(document.getElementById('vProdIsCompetitive')) document.getElementById('vProdIsCompetitive').checked = !!p.isCompetitive;
             if(document.getElementById('vProdImageUrl')) document.getElementById('vProdImageUrl').value = (p.images && p.images[0]) ? p.images[0] : '';
             if(document.getElementById('vProdDesc')) document.getElementById('vProdDesc').value = p.desc || '';
@@ -2376,7 +2439,7 @@
 
             // فتح الواتساب لإرسال التجميعة للادارة
             const msg = `مرحباً، أرغب في إنشاء متجر جديد واشتراك شهري بالمنصة:%0A- اسم المتجر: ${vStoreName}%0A- المسؤول: ${vOwnerName}%0A- الهاتف: ${vPhone}%0A- الخطة: ${vPlan}`;
-            window.open(`https://wa.me/${siteSettings.adminPhone}?text=${msg}`, '_blank');
+            window.open(`https://wa.me/${formatWhatsAppPhone(siteSettings.adminPhone)}?text=${msg}`, '_blank');
 
             bootstrap.Modal.getInstance(document.getElementById('vendorSubscriptionModal')).hide();
             alert("تم إرسال طلب إنشاء متجرك بنجاح! سيتم التواصل معك لتأكيد تفعيل اللوحة.");
@@ -2480,6 +2543,37 @@
             renderPublicProducts(filtered);
         }
 
+        function getProductRating(prod) {
+            if (!prod) return { average: 5.0, count: 1 };
+            if (prod.ratings && Array.isArray(prod.ratings) && prod.ratings.length > 0) {
+                const sum = prod.ratings.reduce((a, b) => a + (parseFloat(b.stars) || 5), 0);
+                const avg = sum / prod.ratings.length;
+                return { average: parseFloat(avg.toFixed(1)), count: prod.ratings.length };
+            }
+            if (prod.rating !== undefined && prod.rating !== null) {
+                return { average: parseFloat(prod.rating) || 5.0, count: prod.ratingCount || 1 };
+            }
+            return { average: 5.0, count: 1 };
+        }
+
+        function renderStarRatingHTML(avgRating, count = 0, isSmall = true) {
+            const starsCount = Math.round(avgRating);
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= starsCount) {
+                    starsHtml += `<i class="fa-solid fa-star text-warning"></i>`;
+                } else {
+                    starsHtml += `<i class="fa-regular fa-star text-muted"></i>`;
+                }
+            }
+            const fontSize = isSmall ? '0.72rem' : '0.85rem';
+            return `<div class="d-flex align-items-center justify-content-center gap-1 my-1" style="font-size: ${fontSize};" title="متوسط التقييم: ${avgRating} من 5">
+                <span class="d-inline-flex align-items-center gap-1" style="font-size: 0.62rem;">${starsHtml}</span>
+                <span class="fw-bold text-dark ms-1" style="font-size:0.75rem;">${avgRating}</span>
+                <small class="text-muted" style="font-size:0.65rem;">(${count})</small>
+            </div>`;
+        }
+
         function getProductPriceInfo(prod) {
             if (!prod) return { isCompetitive: false, currentPrice: 0, originalPrice: null, hasDiscount: false };
             if (prod.isCompetitive) {
@@ -2510,18 +2604,22 @@
         function renderPopularProducts() {
             const section = document.getElementById('popularProductsSection');
             const container = document.getElementById('popularProductsContainer');
-            if (!section || !container) return;
+            if (!section || !container) return [];
 
             const allActive = getActiveTenantProducts();
-            let populars = allActive.filter(p => p.discountPrice || p.oldPrice || p.isCompetitive);
-            if (populars.length < 3) {
-                populars = allActive;
-            }
+            // Filter popular products: prioritize explicitly marked isPopular, or discounted/competitive products
+            let populars = allActive.filter(p => {
+                if (p.isPopular !== undefined && p.isPopular !== null) {
+                    return p.isPopular === true;
+                }
+                return !!(p.discountPrice || p.oldPrice || p.isCompetitive);
+            });
+
             populars = populars.slice(0, 10);
 
             if (populars.length === 0) {
                 section.style.display = 'none';
-                return;
+                return [];
             }
 
             section.style.display = 'block';
@@ -2530,13 +2628,15 @@
             populars.forEach((prod) => {
                 const origIndex = products.findIndex(p => p.id === prod.id);
                 const priceInfo = getProductPriceInfo(prod);
+                const ratingInfo = getProductRating(prod);
                 const imgUrl = (prod.images && prod.images[0]) ? prod.images[0] : 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500';
 
                 container.innerHTML += `
                     <div class="card product-card p-2 text-center shadow-sm border rounded position-relative" style="width: 130px; min-width: 130px; flex-shrink: 0; scroll-snap-align: start; cursor: pointer;" onclick="openProductDetail(${origIndex})">
                         ${priceInfo.hasDiscount ? `<span class="badge bg-danger position-absolute top-0 start-0 m-1" style="font-size:0.6rem; z-index:2;">خصم</span>` : ''}
                         <img src="${imgUrl}" class="rounded mb-1" style="height: 80px; width: 100%; object-fit: contain;">
-                        <h6 class="fw-bold text-dark text-truncate mb-1" style="font-size: 0.75rem; line-height: 1.2;">${prod.title}</h6>
+                        <h6 class="fw-bold text-dark text-truncate mb-0" style="font-size: 0.75rem; line-height: 1.2;">${prod.title}</h6>
+                        ${renderStarRatingHTML(ratingInfo.average, ratingInfo.count, true)}
                         <div class="mb-1" style="min-height: 20px;">
                             ${priceInfo.isCompetitive ? `
                                 <span class="badge bg-warning text-dark" style="font-size: 0.62rem;">سعر تنافسي</span>
@@ -2551,32 +2651,39 @@
                     </div>
                 `;
             });
+
+            return populars.map(p => p.id);
         }
 
         // Display Products in Store
         function renderPublicProducts(productsToRender = null) {
             const baseTenantProducts = getActiveTenantProducts();
-            if (!productsToRender) productsToRender = baseTenantProducts;
+            let popularIds = [];
 
-            if (productsToRender.length === baseTenantProducts.length) {
-                renderPopularProducts();
+            if (!productsToRender || productsToRender.length === baseTenantProducts.length) {
+                popularIds = renderPopularProducts();
+                if (!productsToRender) productsToRender = baseTenantProducts;
             } else {
                 const popularSec = document.getElementById('popularProductsSection');
                 if (popularSec) popularSec.style.display = 'none';
             }
 
+            // Exclude popular products so they are NOT duplicated in the main list below
+            const finalProductsList = productsToRender.filter(p => !popularIds.includes(p.id));
+
             const container = document.getElementById('publicProductsContainer');
-            document.getElementById('productsCountBadge').innerText = `${productsToRender.length} منتج`;
+            document.getElementById('productsCountBadge').innerText = `${finalProductsList.length} منتج`;
             container.innerHTML = '';
 
-            if (productsToRender.length === 0) {
+            if (finalProductsList.length === 0) {
                 container.innerHTML = `<div class="text-center py-5 text-muted w-100"><i class="fa-solid fa-box-open fs-1 d-block mb-2"></i>لا توجد منتجات مطابقة للبحث أو القسم.</div>`;
                 return;
             }
 
-            productsToRender.forEach((prod) => {
+            finalProductsList.forEach((prod) => {
                 const origIndex = products.findIndex(p => p.id === prod.id);
                 const priceInfo = getProductPriceInfo(prod);
+                const ratingInfo = getProductRating(prod);
                 const imgUrl = (prod.images && prod.images[0]) ? prod.images[0] : 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500';
 
                 container.innerHTML += `
@@ -2585,7 +2692,8 @@
                             ${priceInfo.hasDiscount ? `<span class="badge bg-danger position-absolute top-0 start-0 m-1" style="font-size:0.62rem; z-index:2;">خصم</span>` : ''}
                             <div>
                                 <img src="${imgUrl}" class="card-img-top rounded mb-1" style="height: 95px; object-fit: contain;">
-                                <h6 class="card-title fw-bold text-dark text-truncate mb-1" style="font-size: 0.78rem; line-height: 1.25;">${prod.title}</h6>
+                                <h6 class="card-title fw-bold text-dark text-truncate mb-0" style="font-size: 0.78rem; line-height: 1.25;">${prod.title}</h6>
+                                ${renderStarRatingHTML(ratingInfo.average, ratingInfo.count, true)}
                             </div>
                             <div class="mt-1">
                                 <div class="mb-1 text-center">
@@ -2613,9 +2721,13 @@
             });
         }
 
+        let currentSelectedProductIndex = null;
+
         function openProductDetail(index) {
             const prod = products[index];
             if (!prod) return;
+
+            currentSelectedProductIndex = index;
 
             document.getElementById('detailTitle').innerText = prod.title;
             document.getElementById('detailCategory').innerText = prod.category || '';
@@ -2623,7 +2735,7 @@
             
             const adminPhone = (siteSettings && siteSettings.adminPhone) ? siteSettings.adminPhone : '01029190615';
             const waText = encodeURIComponent(`مرحباً، أرغب في الاستفسار عن سعر المنتج التنافسي: ${prod.title}`);
-            const waLink = `https://wa.me/${adminPhone}?text=${waText}`;
+            const waLink = `https://wa.me/${formatWhatsAppPhone(adminPhone)}?text=${waText}`;
 
             const priceInfo = getProductPriceInfo(prod);
 
@@ -2650,6 +2762,69 @@
                 });
             }
 
+            // Ratings & Reviews Update
+            const ratingInfo = getProductRating(prod);
+            const detailRatingBadge = document.getElementById('detailRatingBadge');
+            if (detailRatingBadge) {
+                detailRatingBadge.innerHTML = `
+                    <span class="badge bg-light text-dark border px-2 py-1 fs-6 d-inline-flex align-items-center gap-1">
+                        <i class="fa-solid fa-star text-warning me-1"></i>
+                        <strong>${ratingInfo.average}</strong> / 5
+                    </span>
+                    <small class="text-muted fw-bold">(${ratingInfo.count} تقييمات للعملاء)</small>
+                `;
+            }
+
+            const headerBadge = document.getElementById('detailAvgRatingHeaderBadge');
+            if (headerBadge) headerBadge.innerText = `${ratingInfo.average} / 5 ⭐`;
+
+            const scoreEl = document.getElementById('detailAvgRatingScore');
+            if (scoreEl) scoreEl.innerText = ratingInfo.average;
+
+            const starsEl = document.getElementById('detailAvgRatingStars');
+            if (starsEl) {
+                let sHtml = '';
+                const rounded = Math.round(ratingInfo.average);
+                for (let i = 1; i <= 5; i++) {
+                    sHtml += (i <= rounded) ? `<i class="fa-solid fa-star text-warning me-1"></i>` : `<i class="fa-regular fa-star text-muted me-1"></i>`;
+                }
+                starsEl.innerHTML = sHtml;
+            }
+
+            const countTxtEl = document.getElementById('detailRatingCountText');
+            if (countTxtEl) countTxtEl.innerText = `بناءً على ${ratingInfo.count} تقييمات`;
+
+            // Reset interactive star picker
+            selectStarRating(5);
+
+            // Render reviews list
+            const reviewsContainer = document.getElementById('productReviewsListContainer');
+            if (reviewsContainer) {
+                reviewsContainer.innerHTML = '';
+                const reviewsList = (prod.ratings && prod.ratings.length > 0) ? prod.ratings : [
+                    { stars: 5, name: 'أحمد محمود', comment: 'خامة ممتازة وجودة عالية والتوصيل سريع جداً. أنصح بالتعامل.', date: 'اليوم' },
+                    { stars: 5, name: 'سارة علي', comment: 'المنتج ممتاز والتغليف شيك جداً. شكراً لكم!', date: 'أمس' }
+                ];
+
+                reviewsList.forEach(r => {
+                    let rStars = '';
+                    const starVal = r.stars || 5;
+                    for (let i = 1; i <= 5; i++) {
+                        rStars += (i <= starVal) ? `<i class="fa-solid fa-star text-warning me-1 small"></i>` : `<i class="fa-regular fa-star text-muted me-1 small"></i>`;
+                    }
+                    reviewsContainer.innerHTML += `
+                        <div class="p-2 mb-2 bg-light rounded border">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong class="text-dark small"><i class="fa-solid fa-circle-user text-primary me-1"></i> ${r.name || 'عميل'}</strong>
+                                <small class="text-muted" style="font-size: 0.7rem;">${r.date || 'مؤخراً'}</small>
+                            </div>
+                            <div class="mb-1">${rStars}</div>
+                            <p class="mb-0 text-secondary small" style="font-size: 0.8rem;">${r.comment}</p>
+                        </div>
+                    `;
+                });
+            }
+
             document.getElementById('detailAddToCartBtn').onclick = function() { addToCart(index); };
 
             renderRelated(index);
@@ -2657,6 +2832,47 @@
             document.getElementById('storeHomePage').style.display = 'none';
             document.getElementById('storeDetailPage').style.display = 'block';
             window.scrollTo(0, 0);
+        }
+
+        function selectStarRating(stars) {
+            document.getElementById('selectedStarValue').value = stars;
+            const picker = document.getElementById('interactiveStarPicker');
+            if (!picker) return;
+            const starIcons = picker.querySelectorAll('i');
+            starIcons.forEach((icon, idx) => {
+                if (idx < stars) {
+                    icon.className = "fa-solid fa-star text-warning";
+                } else {
+                    icon.className = "fa-regular fa-star text-muted";
+                }
+            });
+        }
+
+        function submitProductRating() {
+            if (currentSelectedProductIndex === null || !products[currentSelectedProductIndex]) return;
+            const prod = products[currentSelectedProductIndex];
+            const stars = parseInt(document.getElementById('selectedStarValue').value) || 5;
+            const raterNameInput = document.getElementById('raterNameInput');
+            const raterCommentInput = document.getElementById('raterCommentInput');
+
+            const name = (raterNameInput && raterNameInput.value.trim()) ? raterNameInput.value.trim() : (currentUser && currentUser.name ? currentUser.name : 'عميل مميز');
+            const comment = (raterCommentInput && raterCommentInput.value.trim()) ? raterCommentInput.value.trim() : 'منتج ممتاز وجودة ممتازة وخدمة سريعة.';
+
+            if (!prod.ratings) prod.ratings = [];
+            prod.ratings.unshift({
+                stars: stars,
+                name: name,
+                comment: comment,
+                date: new Date().toLocaleDateString('ar-EG')
+            });
+
+            localStorage.setItem('m_products', JSON.stringify(products));
+            broadcastSync();
+
+            alert("تم إرسال تقييمك بنجاح! شكراً لرأيك القيم.");
+            if (raterCommentInput) raterCommentInput.value = '';
+
+            openProductDetail(currentSelectedProductIndex);
         }
 
         function showStoreHome() {
@@ -3303,16 +3519,30 @@ ${itemsTxt}
         // User Auth Handling
         function checkUserNav() {
             const userNavNameEl = document.getElementById('userNavName');
+            const userHeaderIconEl = document.getElementById('userHeaderIcon');
+            const userHeaderAccountBtn = document.getElementById('userHeaderAccountBtn');
             const logoutUserBtn = document.getElementById('logoutUserBtn');
 
             if (currentUser && currentUser.name) {
                 if (userNavNameEl) {
-                    userNavNameEl.innerHTML = `<i class="fa-solid fa-user-check text-success me-1"></i> ${currentUser.name.split(' ')[0]}`;
+                    userNavNameEl.innerText = currentUser.name.split(' ')[0];
+                }
+                if (userHeaderIconEl) {
+                    userHeaderIconEl.className = "fa-solid fa-user-check fs-4 text-success";
+                }
+                if (userHeaderAccountBtn) {
+                    userHeaderAccountBtn.title = `حساب العميل: ${currentUser.name} (اضغط للتفاصيل)`;
                 }
                 if (logoutUserBtn) logoutUserBtn.classList.remove('d-none');
             } else {
                 if (userNavNameEl) {
-                    userNavNameEl.innerHTML = `<i class="fa-solid fa-user me-1"></i> حسابي / تسجيل`;
+                    userNavNameEl.innerText = "حسابي";
+                }
+                if (userHeaderIconEl) {
+                    userHeaderIconEl.className = "fa-solid fa-circle-user fs-4 text-warning";
+                }
+                if (userHeaderAccountBtn) {
+                    userHeaderAccountBtn.title = "حساب العميل وتفاصيل الحساب (اضغط للتسجيل والتفاصيل)";
                 }
                 if (logoutUserBtn) logoutUserBtn.classList.add('d-none');
             }
@@ -3819,6 +4049,7 @@ ${itemsTxt}
             const editId = document.getElementById('editProductId').value;
             const files = document.getElementById('pImages') ? document.getElementById('pImages').files : [];
             const autoTenantId = currentVendor ? currentVendor.id : (currentTenant ? currentTenant.id : 'TNT-101');
+            const isPopular = document.getElementById('pIsPopular') ? document.getElementById('pIsPopular').checked : false;
             const isCompetitive = document.getElementById('pIsCompetitive') ? document.getElementById('pIsCompetitive').checked : false;
 
             const title = document.getElementById('pTitle').value.trim();
@@ -3851,6 +4082,7 @@ ${itemsTxt}
                             stock: 999,
                             usage,
                             desc,
+                            isPopular,
                             isCompetitive,
                             images: (finalImages && finalImages.length > 0) ? finalImages : (products[prodIndex].images || ['https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500'])
                         };
@@ -3871,6 +4103,7 @@ ${itemsTxt}
                         stock: 999,
                         usage,
                         desc,
+                        isPopular,
                         isCompetitive,
                         images: (finalImages && finalImages.length > 0) ? finalImages : ['https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500']
                     };
@@ -3912,6 +4145,7 @@ ${itemsTxt}
             }
             if(document.getElementById('pUsage')) document.getElementById('pUsage').value = p.usage || '';
             if(document.getElementById('pDesc')) document.getElementById('pDesc').value = p.desc || '';
+            if(document.getElementById('pIsPopular')) document.getElementById('pIsPopular').checked = !!p.isPopular;
             if(document.getElementById('pIsCompetitive')) document.getElementById('pIsCompetitive').checked = !!p.isCompetitive;
 
             document.getElementById('productFormHeaderTitle').innerText = "تعديل بيانات المنتج الحالية";
@@ -3933,6 +4167,8 @@ ${itemsTxt}
             document.getElementById('editProductId').value = '';
             document.getElementById('detailedProductForm').reset();
             if(document.getElementById('pImages')) document.getElementById('pImages').value = '';
+            if(document.getElementById('pIsPopular')) document.getElementById('pIsPopular').checked = false;
+            if(document.getElementById('pIsCompetitive')) document.getElementById('pIsCompetitive').checked = false;
             document.getElementById('editImagesPreview').innerHTML = '';
             document.getElementById('productFormHeaderTitle').innerText = "إضافة منتج جديد";
             document.getElementById('saveProductBtn').innerHTML = `<i class="fa-solid fa-paper-plane me-1"></i> نشر المنتج`;
