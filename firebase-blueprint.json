@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "products": {
+      "title": "products",
+      "description": "List of products",
+      "properties": {
+        "id": { "type": "string" },
+        "tenantId": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "subCategory": { "type": "string" },
+        "price": { "type": "number" },
+        "costPrice": { "type": "number" },
+        "discountPrice": { "type": "number" },
+        "stock": { "type": "number" },
+        "usage": { "type": "string" },
+        "desc": { "type": "string" },
+        "isPopular": { "type": "boolean" },
+        "isCompetitive": { "type": "boolean" },
+        "images": { "type": "array" },
+        "ratings": { "type": "array" }
+      },
+      "required": ["title", "price"]
+    },
+    "tenants": {
+      "title": "tenants",
+      "description": "Tenants and vendor accounts",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" }
+      }
+    },
+    "orders": {
+      "title": "orders",
+      "description": "Customer orders",
+      "properties": {
+        "id": { "type": "string" },
+        "customerName": { "type": "string" },
+        "total": { "type": "number" }
+      }
+    }
+  }
+}

@@ -280,17 +280,32 @@
         .site-footer a { color: #cbd5e1; text-decoration: none; transition: color 0.2s; }
         .site-footer a:hover { color: #38bdf8; }
 
-        /* Sidebar Backdrop for Mobile Touch UI */
+        /* Sidebar Backdrop for Mobile Touch UI - NEVER display backdrop on Desktop (min-width: 992px) */
         .sidebar-backdrop {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.5);
+            background: rgba(15, 23, 42, 0.4);
             backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
             z-index: 1039;
         }
-        .sidebar-backdrop.active {
-            display: block;
+
+        @media (min-width: 992px) {
+            .sidebar-backdrop, .sidebar-backdrop.active {
+                display: none !important;
+                pointer-events: none !important;
+                visibility: hidden !important;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .sidebar-backdrop.active {
+                display: block !important;
+            }
+            #appSidebar {
+                z-index: 1040 !important;
+            }
         }
 
         /* Mobile Category Chips Bar */
@@ -1623,6 +1638,179 @@
     <!-- JavaScript Dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Firebase Realtime Cloud Synchronization (Realtime Firestore) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            projectId: "gen-lang-client-0810986569",
+            appId: "1:989195096905:web:b8b098c7cfe9609181c098",
+            apiKey: "AIzaSyCtyKMjC_RkQgmSpCaYhpxcT1A9FFDcEjA",
+            authDomain: "gen-lang-client-0810986569.firebaseapp.com",
+            firestoreDatabaseId: "ai-studio-a683d017-f42e-410d-aa8f-b121d28c0bf5",
+            storageBucket: "gen-lang-client-0810986569.firebasestorage.app",
+            messagingSenderId: "989195096905"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+
+        window.firebaseDB = db;
+
+        // Cloud sync helper functions
+        window.syncProductToCloud = async function(prod) {
+            try {
+                if (!prod || !prod.id) return;
+                const prodRef = doc(db, "products", String(prod.id));
+                const cleanProd = JSON.parse(JSON.stringify(prod));
+                await setDoc(prodRef, cleanProd);
+            } catch(err) {
+                console.error("Firebase sync product error:", err);
+            }
+        };
+
+        window.deleteProductFromCloud = async function(prodId) {
+            try {
+                if (!prodId) return;
+                const prodRef = doc(db, "products", String(prodId));
+                await deleteDoc(prodRef);
+            } catch(err) {
+                console.error("Firebase delete product error:", err);
+            }
+        };
+
+        window.syncTenantToCloud = async function(tenant) {
+            try {
+                if (!tenant || !tenant.id) return;
+                const tRef = doc(db, "tenants", String(tenant.id));
+                await setDoc(tRef, JSON.parse(JSON.stringify(tenant)));
+            } catch(err) { console.error("Firebase sync tenant error:", err); }
+        };
+
+        window.deleteTenantFromCloud = async function(tenantId) {
+            try {
+                if (!tenantId) return;
+                const tRef = doc(db, "tenants", String(tenantId));
+                await deleteDoc(tRef);
+            } catch(err) { console.error("Firebase delete tenant error:", err); }
+        };
+
+        window.syncCategoriesToCloud = async function(cats) {
+            try {
+                const cRef = doc(db, "settings", "categories");
+                await setDoc(cRef, { list: JSON.parse(JSON.stringify(cats)) });
+            } catch(err) { console.error("Firebase sync categories error:", err); }
+        };
+
+        window.syncOrderToCloud = async function(order) {
+            try {
+                if (!order || !order.id) return;
+                const oRef = doc(db, "orders", String(order.id));
+                await setDoc(oRef, JSON.parse(JSON.stringify(order)));
+            } catch(err) { console.error("Firebase sync order error:", err); }
+        };
+
+        window.syncSettingsToCloud = async function(settings) {
+            try {
+                const sRef = doc(db, "settings", "site");
+                await setDoc(sRef, JSON.parse(JSON.stringify(settings)));
+            } catch(err) { console.error("Firebase sync settings error:", err); }
+        };
+
+        // --- Realtime Firestore Listeners ---
+        let isInitialProductsLoaded = false;
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            if (!snapshot.empty) {
+                const cloudProducts = [];
+                snapshot.forEach(docSnap => {
+                    cloudProducts.push(docSnap.data());
+                });
+                cloudProducts.sort((a, b) => (b.id || 0) - (a.id || 0));
+                window.products = cloudProducts;
+                localStorage.setItem('m_products', JSON.stringify(window.products));
+                if (typeof window.refreshAllUI === 'function') {
+                    window.refreshAllUI();
+                }
+                isInitialProductsLoaded = true;
+            } else {
+                if (!isInitialProductsLoaded && window.products && window.products.length > 0) {
+                    window.products.forEach(p => {
+                        setDoc(doc(db, "products", String(p.id)), JSON.parse(JSON.stringify(p)));
+                    });
+                    isInitialProductsLoaded = true;
+                }
+            }
+        }, (err) => console.error("Products snapshot error:", err));
+
+        let isInitialTenantsLoaded = false;
+        onSnapshot(collection(db, "tenants"), (snapshot) => {
+            if (!snapshot.empty) {
+                const cloudTenants = [];
+                snapshot.forEach(docSnap => {
+                    cloudTenants.push(docSnap.data());
+                });
+                window.tenants = cloudTenants;
+                localStorage.setItem('m_tenants', JSON.stringify(window.tenants));
+                if (typeof window.refreshAllUI === 'function') {
+                    window.refreshAllUI();
+                }
+                isInitialTenantsLoaded = true;
+            } else {
+                if (!isInitialTenantsLoaded && window.tenants && window.tenants.length > 0) {
+                    window.tenants.forEach(t => {
+                        setDoc(doc(db, "tenants", String(t.id)), JSON.parse(JSON.stringify(t)));
+                    });
+                    isInitialTenantsLoaded = true;
+                }
+            }
+        }, (err) => console.error("Tenants snapshot error:", err));
+
+        onSnapshot(doc(db, "settings", "categories"), (docSnap) => {
+            if (docSnap.exists() && docSnap.data().list) {
+                window.categories = docSnap.data().list;
+                localStorage.setItem('m_categories', JSON.stringify(window.categories));
+                if (typeof window.refreshAllUI === 'function') {
+                    window.refreshAllUI();
+                }
+            }
+        });
+
+        let isInitialOrdersLoaded = false;
+        onSnapshot(collection(db, "orders"), (snapshot) => {
+            if (!snapshot.empty) {
+                const cloudOrders = [];
+                snapshot.forEach(docSnap => {
+                    cloudOrders.push(docSnap.data());
+                });
+                cloudOrders.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+                window.orders = cloudOrders;
+                localStorage.setItem('m_orders', JSON.stringify(window.orders));
+                if (typeof window.refreshAllUI === 'function') {
+                    window.refreshAllUI();
+                }
+                isInitialOrdersLoaded = true;
+            } else {
+                if (!isInitialOrdersLoaded && window.orders && window.orders.length > 0) {
+                    window.orders.forEach(o => {
+                        setDoc(doc(db, "orders", String(o.id)), JSON.parse(JSON.stringify(o)));
+                    });
+                    isInitialOrdersLoaded = true;
+                }
+            }
+        });
+
+        onSnapshot(doc(db, "settings", "site"), (docSnap) => {
+            if (docSnap.exists()) {
+                window.siteSettings = docSnap.data();
+                localStorage.setItem('m_site_settings', JSON.stringify(window.siteSettings));
+                if (typeof window.refreshAllUI === 'function') {
+                    window.refreshAllUI();
+                }
+            }
+        });
+    </script>
+
     <script>
         // Data Structures & Local Storage Initialization
         let siteSettings = JSON.parse(localStorage.getItem('m_site_settings')) || {
@@ -1862,7 +2050,11 @@
             
             if(document.getElementById('footerStoreTitle')) document.getElementById('footerStoreTitle').innerText = storeTitle;
             if(document.getElementById('footerRightsDisplay')) document.getElementById('footerRightsDisplay').innerText = siteSettings.footerRights || "حقوق الملكية وتطوير المنصة الرقمية © Mohamed Nazih (01029190615)";
-            if(document.getElementById('footerWhatsappBtn')) document.getElementById('footerWhatsappBtn').href = `https://wa.me/${adminPhone}`;
+            if(document.getElementById('footerWhatsappBtn')) {
+                const formattedPhone = formatWhatsAppPhone(adminPhone);
+                document.getElementById('footerWhatsappBtn').href = `https://api.whatsapp.com/send?phone=${formattedPhone}`;
+                document.getElementById('footerWhatsappBtn').target = '_blank';
+            }
 
             document.getElementById('setStoreName').value = siteSettings.storeName;
             document.getElementById('setAnnouncement').value = siteSettings.announcement;
@@ -1874,13 +2066,27 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('appSidebar');
             const backdrop = document.getElementById('sidebarBackdrop');
+            if (!sidebar) return;
+
             sidebar.classList.toggle('collapsed');
-            if(backdrop) {
-                if(!sidebar.classList.contains('collapsed')) {
+
+            if (backdrop) {
+                if (window.innerWidth < 992 && !sidebar.classList.contains('collapsed')) {
                     backdrop.classList.add('active');
                 } else {
                     backdrop.classList.remove('active');
                 }
+            }
+        }
+
+        function closeSidebarMobile() {
+            const sidebar = document.getElementById('appSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (sidebar && window.innerWidth < 992) {
+                sidebar.classList.add('collapsed');
+            }
+            if (backdrop) {
+                backdrop.classList.remove('active');
             }
         }
 
@@ -1906,9 +2112,7 @@
             if(exitVendorBtn) exitVendorBtn.style.display = 'none';
 
             // إغلاق الدرور الجانبي على الموبايل
-            const backdrop = document.getElementById('sidebarBackdrop');
-            if(backdrop) backdrop.classList.remove('active');
-            document.getElementById('appSidebar').classList.add('collapsed');
+            closeSidebarMobile();
 
             if (mode === 'admin') {
                 document.getElementById('adminView').classList.add('active');
@@ -2025,6 +2229,7 @@
 
             tenants.unshift(newTenant);
             localStorage.setItem('m_tenants', JSON.stringify(tenants));
+            if (window.syncTenantToCloud) window.syncTenantToCloud(newTenant);
 
             currentVendor = newTenant;
             localStorage.setItem('m_vendor', JSON.stringify(newTenant));
@@ -2058,7 +2263,7 @@
             const btnEl = document.getElementById('btn-vsec-' + secId);
             if (btnEl) btnEl.classList.add('active');
 
-            document.getElementById('appSidebar').classList.add('collapsed');
+            closeSidebarMobile();
 
             if (updateHash) window.location.hash = 'vendor';
 
@@ -2138,7 +2343,8 @@
                         isCompetitive,
                         images: [imageUrl]
                     };
-                    alert("تم تعديل بيانات المنتج بنجاح!");
+                    if (window.syncProductToCloud) window.syncProductToCloud(products[prodIndex]);
+                    alert("تم تعديل بيانات المنتج بنجاح وتأكيد المزامنة الفورية السحابية!");
                 }
             } else {
                 const newProd = {
@@ -2150,7 +2356,8 @@
                     images: [imageUrl]
                 };
                 products.unshift(newProd);
-                alert("تم إضافة ونشر المنتج لمتجرك بنجاح!");
+                if (window.syncProductToCloud) window.syncProductToCloud(newProd);
+                alert("تم إضافة ونشر المنتج لمتجرك بنجاح بمزامنة سحابية فورية!");
             }
 
             localStorage.setItem('m_products', JSON.stringify(products));
@@ -2188,6 +2395,7 @@
             if(confirm("هل أنت تأكد من حذف هذا المنتج من متجرك؟")) {
                 products = products.filter(x => x.id != prodId);
                 localStorage.setItem('m_products', JSON.stringify(products));
+                if (window.deleteProductFromCloud) window.deleteProductFromCloud(prodId);
                 broadcastSync();
                 renderVendorProducts();
                 renderPublicProducts();
@@ -2278,6 +2486,7 @@
             }
 
             localStorage.setItem('m_categories', JSON.stringify(categories));
+            if (window.syncCategoriesToCloud) window.syncCategoriesToCloud(categories);
             broadcastSync();
             document.getElementById('vMainCatInput').value = '';
             document.getElementById('vSubCatInput').value = '';
@@ -2349,6 +2558,7 @@
             if(tIdx !== -1) {
                 tenants[tIdx] = { ...tenants[tIdx], ...currentVendor };
                 localStorage.setItem('m_tenants', JSON.stringify(tenants));
+                if (window.syncTenantToCloud) window.syncTenantToCloud(tenants[tIdx]);
             }
 
             localStorage.setItem('m_vendor', JSON.stringify(currentVendor));
@@ -2438,8 +2648,8 @@
             localStorage.setItem('m_tenants', JSON.stringify(tenants));
 
             // فتح الواتساب لإرسال التجميعة للادارة
-            const msg = `مرحباً، أرغب في إنشاء متجر جديد واشتراك شهري بالمنصة:%0A- اسم المتجر: ${vStoreName}%0A- المسؤول: ${vOwnerName}%0A- الهاتف: ${vPhone}%0A- الخطة: ${vPlan}`;
-            window.open(`https://wa.me/${formatWhatsAppPhone(siteSettings.adminPhone)}?text=${msg}`, '_blank');
+            const msg = `مرحباً، أرغب في إنشاء متجر جديد واشتراك شهري بالمنصة:\n- اسم المتجر: ${vStoreName}\n- المسؤول: ${vOwnerName}\n- الهاتف: ${vPhone}\n- الخطة: ${vPlan}`;
+            sendWhatsAppMessage(siteSettings.adminPhone, msg);
 
             bootstrap.Modal.getInstance(document.getElementById('vendorSubscriptionModal')).hide();
             alert("تم إرسال طلب إنشاء متجرك بنجاح! سيتم التواصل معك لتأكيد تفعيل اللوحة.");
@@ -2521,7 +2731,7 @@
         // تصفية المنتجات حسب القسم الرئيسي والقسم الفرعي
         function filterByCategories(mainCat, subCat) {
             showStoreHome();
-            document.getElementById('appSidebar').classList.add('collapsed');
+            closeSidebarMobile();
             let filtered = getActiveTenantProducts();
 
             if (mainCat !== 'all') {
@@ -2867,6 +3077,7 @@
             });
 
             localStorage.setItem('m_products', JSON.stringify(products));
+            if (window.syncProductToCloud) window.syncProductToCloud(prod);
             broadcastSync();
 
             alert("تم إرسال تقييمك بنجاح! شكراً لرأيك القيم.");
@@ -3092,6 +3303,7 @@
 
         function saveCategories() {
             localStorage.setItem('m_categories', JSON.stringify(categories));
+            if (window.syncCategoriesToCloud) window.syncCategoriesToCloud(categories);
         }
 
         // Admin Inner Section Navigation
@@ -3111,7 +3323,7 @@
                 btnEl.classList.add('active');
             }
 
-            document.getElementById('appSidebar').classList.add('collapsed');
+            closeSidebarMobile();
 
             if (updateHash) {
                 window.location.hash = 'sec-' + secId;
@@ -3206,7 +3418,7 @@
             if(cartModalEl) new bootstrap.Modal(cartModalEl).show(); 
         }
 
-        // WhatsApp Phone Number Formatter (Fixes international format requirements for wa.me)
+        // WhatsApp Phone Number Formatter (Fixes international format requirements for WhatsApp API)
         function formatWhatsAppPhone(phone) {
             if (!phone) return '201029190615';
             let cleaned = phone.toString().trim().replace(/[^\d]/g, '');
@@ -3219,6 +3431,22 @@
                 cleaned = '20' + cleaned;
             }
             return cleaned;
+        }
+
+        // Official WhatsApp Direct API Sender Helper
+        function sendWhatsAppMessage(phone, textMessage) {
+            const formattedPhone = formatWhatsAppPhone(phone);
+            const encodedText = encodeURIComponent(textMessage);
+            const waUrl = `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodedText}`;
+            
+            try {
+                const newWin = window.open(waUrl, '_blank');
+                if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') {
+                    window.location.href = waUrl;
+                }
+            } catch (err) {
+                window.location.href = waUrl;
+            }
         }
 
         // Order Submission & Tracking
@@ -3310,9 +3538,7 @@ ${itemsTxt}
             // Generate and download PDF invoice automatically
             exportInvoicePDFById(newOrder.id);
 
-            const formattedAdminPhone = formatWhatsAppPhone(adminPhone);
-            const waUrl = `https://wa.me/${formattedAdminPhone}?text=${encodeURIComponent(waMsg)}`;
-            window.open(waUrl, '_blank');
+            sendWhatsAppMessage(adminPhone, waMsg);
 
             alert(`تم تسجيل طلبك وحفظ ملف الفاتورة المنسقة (PDF) برقم (${newOrder.id}) تلقائياً على جهازك!\n\nجاري تحويلك للواتساب الآن. لإرسال الفاتورة كملف PDF إلى التاجر:\n1️⃣ اضغط على أيقونة المرفقات (📎) في الواتساب.\n2️⃣ اختر (مستند / Document).\n3️⃣ اختر ملف الفاتورة المرفقة (الفاتورة_${newOrder.id}.pdf) لإرساله فوراً.`);
             renderCustomerInvoicesArchive();
@@ -3495,9 +3721,7 @@ ${itemsTxt}
             // Auto download PDF
             exportInvoicePDFById(ord.id);
 
-            const formattedPhone = formatWhatsAppPhone(adminPhone);
-            const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(waMsg)}`;
-            window.open(waUrl, '_blank');
+            sendWhatsAppMessage(adminPhone, waMsg);
 
             alert(`تم تحميل ملف الفاتورة المنسقة (PDF) برقم (${ord.id}) تلقائياً على جهازك!\n\nجاري تحويلك إلى الواتساب. لإرسال الفاتورة كملف PDF إلى المستقبل:\n1️⃣ اضغط على زر المرفقات (📎) في محادثة الواتساب.\n2️⃣ اختر (مستند / Document).\n3️⃣ اختر ملف الفاتورة (الفاتورة_${ord.id}.pdf) لإرساله فوراً.`);
         }
@@ -3936,6 +4160,7 @@ ${itemsTxt}
             if(newPass && newPass.trim() !== '') {
                 tenants[idx].password = newPass.trim();
                 localStorage.setItem('m_tenants', JSON.stringify(tenants));
+                if (window.syncTenantToCloud) window.syncTenantToCloud(tenants[idx]);
                 renderTenantsTable();
                 alert("تم تغيير كلمة السر بنجاح!");
             }
@@ -3943,8 +4168,10 @@ ${itemsTxt}
 
         function deleteTenant(idx) {
             if(confirm("هل أنت تأكد من إلغاء وحذف هذا المتجر/المشترك؟")) {
+                const deletedTenantId = tenants[idx] ? tenants[idx].id : null;
                 tenants.splice(idx, 1);
                 localStorage.setItem('m_tenants', JSON.stringify(tenants));
+                if (deletedTenantId && window.deleteTenantFromCloud) window.deleteTenantFromCloud(deletedTenantId);
                 renderTenantsTable();
             }
         }
@@ -4087,8 +4314,9 @@ ${itemsTxt}
                             images: (finalImages && finalImages.length > 0) ? finalImages : (products[prodIndex].images || ['https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500'])
                         };
                         localStorage.setItem('m_products', JSON.stringify(products));
+                        if (window.syncProductToCloud) window.syncProductToCloud(products[prodIndex]);
                         broadcastSync();
-                        alert("تم تعديل بيانات المنتج بنجاح!");
+                        alert("تم تعديل بيانات المنتج بنجاح بالمزامنة السحابية!");
                     }
                 } else {
                     const newProd = {
@@ -4109,8 +4337,9 @@ ${itemsTxt}
                     };
                     products.unshift(newProd);
                     localStorage.setItem('m_products', JSON.stringify(products));
+                    if (window.syncProductToCloud) window.syncProductToCloud(newProd);
                     broadcastSync();
-                    alert("تم نشر المنتج بنجاح!");
+                    alert("تم نشر المنتج بنجاح بالمزامنة السحابية الفورية!");
                 }
 
                 resetProductForm();
@@ -4207,8 +4436,10 @@ ${itemsTxt}
 
         function deleteProduct(index) {
             if(confirm("هل أنت تأكد من حذف المنتج؟")) {
+                const prodId = products[index] ? products[index].id : null;
                 products.splice(index, 1);
                 localStorage.setItem('m_products', JSON.stringify(products));
+                if (prodId && window.deleteProductFromCloud) window.deleteProductFromCloud(prodId);
                 renderAdminProductManage();
                 renderPublicProducts();
             }
@@ -4224,8 +4455,9 @@ ${itemsTxt}
                 footerRights: document.getElementById('setFooterRights').value
             };
             localStorage.setItem('m_site_settings', JSON.stringify(siteSettings));
+            if (window.syncSettingsToCloud) window.syncSettingsToCloud(siteSettings);
             applySiteSettings();
-            alert("تم تطبيق الإعدادات بنجاح!");
+            alert("تم تطبيق الإعدادات بنجاح بالمزامنة السحابية!");
         };
     </script>
 </body>
