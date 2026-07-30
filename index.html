@@ -451,6 +451,129 @@
             }
             .no-print { display: none !important; }
         }
+
+        /* File Explorer & PDF Catalog Manager Styles */
+        .pdf-explorer-wrapper {
+            background-color: #f8fafc;
+            border-radius: 16px;
+            padding: 14px;
+            min-height: 520px;
+            border: 1px solid #e2e8f0;
+        }
+        .pdf-item-card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .pdf-item-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+        .pdf-item-card.grid-mode {
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: space-between;
+            height: 100%;
+            margin-bottom: 0;
+            padding: 14px;
+        }
+        .pdf-icon-box-folder {
+            width: 46px;
+            height: 46px;
+            background-color: #334155;
+            color: #ffffff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .pdf-icon-box-pdf {
+            width: 46px;
+            height: 46px;
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 900;
+            flex-shrink: 0;
+            letter-spacing: 0.5px;
+        }
+        .pdf-icon-box-image {
+            width: 46px;
+            height: 46px;
+            background-color: #fff1f2;
+            border: 1px solid #fecdd3;
+            color: #e11d48;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            flex-shrink: 0;
+        }
+        .pdf-item-title {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+        .pdf-item-date {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .pdf-view-toggle-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #475569;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .pdf-view-toggle-btn.active {
+            background-color: #1e293b;
+            color: #ffffff;
+            border-color: #1e293b;
+        }
+        .pdf-explorer-nav-tab {
+            color: #64748b;
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+        }
+        .pdf-explorer-nav-tab.active {
+            background-color: #e2e8f0;
+            color: #0f172a;
+        }
     </style>
 </head>
 <body>
@@ -492,7 +615,7 @@
     </header>
 
     <!-- خلفية حجب للشاشات الصغيرة عند فتح القائمة الجانبية -->
-    <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+    <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="closeSidebarMobile()"></div>
 
     <!-- الهيكل العام بالتصميم الذي يحتوي على القائمة الجانبية والمحتوى -->
     <div id="mainAppWrapper">
@@ -510,6 +633,12 @@
                 <div class="accordion accordion-flush" id="storeCategoriesAccordion">
                     <!-- يتم بناؤها تلقائياً بواسطة JavaScript -->
                 </div>
+
+                <div class="px-2 pt-3 mt-3 border-top">
+                    <button class="sidebar-menu-btn text-danger fw-bold w-100" onclick="showCustomerPdfCatalog()">
+                        <i class="fa-solid fa-folder-open text-danger me-1"></i> <span>كتالوجات وملفات PDF</span>
+                    </button>
+                </div>
             </div>
 
             <!-- قائمة لوحة تحكم المشترك / التاجر (Vendor Sidebar Nav) -->
@@ -521,6 +650,9 @@
                     </button>
                     <button class="sidebar-menu-btn" id="btn-vsec-categories" onclick="showVendorSection('categories')">
                         <i class="fa-solid fa-folder-tree text-info"></i> <span>أقسام متجري</span>
+                    </button>
+                    <button class="sidebar-menu-btn" id="btn-vsec-pdfCatalog" onclick="showVendorSection('pdfCatalog')">
+                        <i class="fa-solid fa-folder-open text-warning"></i> <span>كتالوجات وملفات PDF</span>
                     </button>
                     <button class="sidebar-menu-btn" id="btn-vsec-orders" onclick="showVendorSection('orders')">
                         <i class="fa-solid fa-receipt text-success"></i> <span>طلبات متجري</span>
@@ -549,6 +681,9 @@
                     </button>
                     <button class="sidebar-menu-btn" id="btn-sec-addProduct" onclick="showAdminSection('addProduct')">
                         <i class="fa-solid fa-plus-minus text-success"></i> <span>إدارة وإضافة المنتجات</span>
+                    </button>
+                    <button class="sidebar-menu-btn" id="btn-sec-pdfCatalog" onclick="showAdminSection('pdfCatalog')">
+                        <i class="fa-solid fa-folder-open text-warning"></i> <span>مدير الملفات والكتالوجات (PDF)</span>
                     </button>
                     <button class="sidebar-menu-btn" id="btn-sec-orders" onclick="showAdminSection('orders')">
                         <i class="fa-solid fa-receipt text-primary"></i> <span>إدارة كافة الطلبات</span>
@@ -643,6 +778,9 @@
                                     <button id="detailAddToCartBtn" class="btn btn-primary btn-lg w-100 fw-bold mt-3">
                                         <i class="fa-solid fa-cart-plus me-2"></i> إضافة للسلة
                                     </button>
+                                    <button class="btn btn-outline-danger btn-md w-100 fw-bold mt-2" onclick="showCustomerPdfCatalog()">
+                                        <i class="fa-solid fa-file-pdf me-2"></i> استعراض كتالوج ومواصفات الكتالوجات (PDF)
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -699,6 +837,19 @@
                         <!-- منتجات مقترحة ومشابهة -->
                         <h5 class="fw-bold mb-3 border-bottom pb-2">منتجات مقترحة ومقارية</h5>
                         <div class="row g-2 g-md-3 mb-5" id="relatedProductsContainer"></div>
+                    </div>
+
+                    <!-- صفحة مكتبة الكتالوجات ومدير الملفات للعملاء -->
+                    <div id="storePdfCatalogPage" class="store-subview" style="display: none;">
+                        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn-back-global" onclick="showStoreHome()"><i class="fa-solid fa-arrow-right"></i> العودة للمتجر</button>
+                                <h5 class="fw-bold text-dark mb-0 fs-6 fs-md-5">
+                                    <i class="fa-solid fa-folder-open text-danger me-1"></i> مكتبة الكتالوجات والملفات (PDF)
+                                </h5>
+                            </div>
+                        </div>
+                        <div id="customerPdfExplorerContainer"></div>
                     </div>
 
                     <!-- تذييل الموقع المصغر والمنسق (SaaS Compact Multi-Vendor Footer) -->
@@ -963,6 +1114,12 @@
                                     <input type="file" id="pImages" class="form-control" accept="image/*" multiple>
                                     <div id="editImagesPreview" class="d-flex gap-2 mt-2"></div>
                                 </div>
+                                <div class="col-md-12 bg-light p-3 rounded border">
+                                    <label class="form-label fw-bold text-danger"><i class="fa-solid fa-file-pdf me-1"></i> إرفاق كتالوج أو ملف مواصفات (PDF / صورة - اختياري)</label>
+                                    <input type="file" id="pPdfCatalogFile" class="form-control mb-1" accept="application/pdf,image/*">
+                                    <input type="url" id="pPdfCatalogUrl" class="form-control form-control-sm" placeholder="أو أدخل رابط PDF مباشر (https://...)">
+                                    <small class="text-muted">الملف المرفق يظهر للعملاء بصفحة المنتج وفي مدير الكتالوجات والملفات.</small>
+                                </div>
                             </div>
                             <div class="d-flex gap-2 mt-3">
                                 <button type="submit" id="saveProductBtn" class="btn btn-success fw-bold px-4"><i class="fa-solid fa-paper-plane me-1"></i> نشر المنتج</button>
@@ -1138,6 +1295,28 @@
                     </div>
                 </div>
 
+                <!-- 10. قسم مدير الملفات والكتالوجات (PDF) -->
+                <div id="sec-pdfCatalog" class="admin-tab-content" style="display:none;">
+                    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="btn-back-global" onclick="handlePdfCatalogBack()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                            <h5 class="fw-bold mb-0 text-dark">
+                                <i class="fa-solid fa-folder-open text-warning me-2"></i> مدير الملفات والكتالوجات (PDF Catalog Explorer)
+                            </h5>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-danger btn-sm fw-bold shadow-sm" onclick="openUploadPdfModal()">
+                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> رفع ملف / كتالوج PDF
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm fw-bold shadow-sm" onclick="openAddFolderModal()">
+                                <i class="fa-solid fa-folder-plus me-1"></i> إنشاء مجلد جديد
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="adminPdfExplorerContainer"></div>
+                </div>
+
             </div>
 
             <!-- واجهة لوحة تحكم التاجر / المشترك (Vendor Control Panel) -->
@@ -1208,6 +1387,11 @@
                             <div class="col-md-12">
                                 <label class="form-label fw-bold">وصف مفصل للمنتج</label>
                                 <textarea id="vProdDesc" class="form-control" rows="2" placeholder="اكتب مواصفات المنتج وطريقة الاستخدام..."></textarea>
+                            </div>
+                            <div class="col-md-12 bg-white p-3 rounded border">
+                                <label class="form-label fw-bold text-danger"><i class="fa-solid fa-file-pdf me-1"></i> إرفاق كتالوج أو ملف مواصفات (PDF / صورة - اختياري)</label>
+                                <input type="file" id="vProdPdfCatalogFile" class="form-control mb-1" accept="application/pdf,image/*">
+                                <input type="url" id="vProdPdfCatalogUrl" class="form-control form-control-sm" placeholder="أو أدخل رابط PDF مباشر (https://...)">
                             </div>
                             <div class="col-12 text-end">
                                 <button type="submit" class="btn btn-primary fw-bold"><i class="fa-solid fa-paper-plane me-1"></i> حفظ ونشر المنتج بالمتجر</button>
@@ -1307,6 +1491,28 @@
                             </div>
                         </form>
                     </div>
+                </div>
+
+                <!-- 5. كتالوجات وملفات PDF لمتجري -->
+                <div id="vsec-pdfCatalog" class="vendor-tab-content" style="display:none;">
+                    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="btn-back-global" onclick="handlePdfCatalogBack()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                            <h5 class="fw-bold mb-0 text-dark">
+                                <i class="fa-solid fa-folder-open text-warning me-2"></i> كتالوجات وملفات PDF لمتجرك
+                            </h5>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-danger btn-sm fw-bold shadow-sm" onclick="openUploadPdfModal()">
+                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> رفع ملف / كتالوج PDF
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm fw-bold shadow-sm" onclick="openAddFolderModal()">
+                                <i class="fa-solid fa-folder-plus me-1"></i> إنشاء مجلد جديد
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="vendorPdfExplorerContainer"></div>
                 </div>
             </div>
 
@@ -1632,6 +1838,151 @@
         </div>
     </div>
 
+    <!-- Modal استعراض وتحميل ملف PDF (PDF Viewer & Download Modal) -->
+    <div class="modal fade" id="pdfViewerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title fw-bold fs-6" id="pdfViewerModalTitle">
+                        <i class="fa-solid fa-file-pdf text-danger me-2"></i> استعراض ومعاينة الكتالوج (PDF)
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0 text-center bg-secondary-subtle">
+                    <div id="pdfViewerFrameContainer" style="min-height: 500px; height: 75vh; width: 100%;">
+                        <iframe id="pdfViewerIframe" src="" style="width:100%; height:100%; border:none;"></iframe>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <button type="button" class="btn btn-secondary btn-sm fw-bold" data-bs-dismiss="modal">إغلاق</button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success btn-sm fw-bold" id="pdfViewerWaBtn">
+                            <i class="fa-brands fa-whatsapp me-1"></i> مشاركة عبر الواتساب
+                        </button>
+                        <a id="pdfViewerDownloadBtn" href="#" download class="btn btn-danger btn-sm fw-bold" target="_blank">
+                            <i class="fa-solid fa-download me-1"></i> تحميل ملف الـ PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal رفع ملف / كتالوج PDF جديد -->
+    <div class="modal fade" id="uploadPdfModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold fs-6">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i> إرفاق ملف أو كتالوج PDF جديد
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="uploadPdfForm" onsubmit="handleUploadPdfSubmit(event)">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">اسم الكتالوج / الملف <span class="text-danger">*</span></label>
+                            <input type="text" id="pdfTitleInput" class="form-control" placeholder="مثال: استنسل مقاس 20 * 30" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">اختر المجلد / القسم <span class="text-danger">*</span></label>
+                            <select id="pdfFolderSelect" class="form-select" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">نوع الملف</label>
+                            <select id="pdfTypeSelect" class="form-select">
+                                <option value="pdf">ملف PDF (كتالوج / مواصفات)</option>
+                                <option value="image">صورة (كتالوج مصور)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">اختر الملف من جهازك (PDF أو صورة)</label>
+                            <input type="file" id="pdfFileInput" class="form-control" accept="application/pdf,image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">أو أدخل رابط الملف المباشر (https://...)</label>
+                            <input type="url" id="pdfUrlInput" class="form-control" placeholder="https://example.com/catalog.pdf">
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100 fw-bold py-2">
+                            <i class="fa-solid fa-check me-1"></i> حفظ وإدراج الملف
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal إنشاء مجلد جديد -->
+    <div class="modal fade" id="addFolderModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold fs-6">
+                        <i class="fa-solid fa-folder-plus me-2 text-warning"></i> إنشاء مجلد كتالوجات جديد
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addFolderForm" onsubmit="handleAddFolderSubmit(event)">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">اسم المجلد الجديد <span class="text-danger">*</span></label>
+                            <input type="text" id="folderTitleInput" class="form-control" placeholder="مثال: كتالوجات دهانات 2025" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
+                            <i class="fa-solid fa-folder-plus me-1"></i> إنشاء المجلد
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal تعديل وتغيير ملف / كتالوج PDF -->
+    <div class="modal fade" id="editPdfModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold fs-6">
+                        <i class="fa-solid fa-pen-to-square me-2"></i> تعديل وتغيير الكتالوج / الملف
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPdfForm" onsubmit="handleEditPdfSubmit(event)">
+                        <input type="hidden" id="editPdfItemId">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">اسم الكتالوج / الملف <span class="text-danger">*</span></label>
+                            <input type="text" id="editPdfTitleInput" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">اختر المجلد / القسم</label>
+                            <select id="editPdfFolderSelect" class="form-select"></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">نوع الملف</label>
+                            <select id="editPdfTypeSelect" class="form-select">
+                                <option value="pdf">ملف PDF (كتالوج / مواصفات)</option>
+                                <option value="image">صورة (كتالوج مصور)</option>
+                                <option value="folder">مجلد</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">استبدال ملف PDF من جهازك (اختياري)</label>
+                            <input type="file" id="editPdfFileInput" class="form-control" accept="application/pdf,image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">أو تغيير رابط الملف المباشر (https://...)</label>
+                            <input type="url" id="editPdfUrlInput" class="form-control" placeholder="https://example.com/catalog.pdf">
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 fw-bold py-2 text-dark">
+                            <i class="fa-solid fa-check me-1"></i> حفظ التعديلات وتحديث الكتالوج
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
@@ -1809,6 +2160,43 @@
                 }
             }
         });
+
+        window.syncCatalogToCloud = async function(catItem) {
+            try {
+                if (!catItem || !catItem.id) return;
+                const cRef = doc(db, "catalogs", String(catItem.id));
+                await setDoc(cRef, JSON.parse(JSON.stringify(catItem)));
+            } catch(e) { console.error("Firebase sync catalog error:", e); }
+        };
+
+        window.deleteCatalogFromCloud = async function(catId) {
+            try {
+                if (!catId) return;
+                const cRef = doc(db, "catalogs", String(catId));
+                await deleteDoc(cRef);
+            } catch(e) { console.error("Firebase delete catalog error:", e); }
+        };
+
+        let isInitialCatalogsLoaded = false;
+        onSnapshot(collection(db, "catalogs"), (snapshot) => {
+            if (!snapshot.empty) {
+                const cloudCatalogs = [];
+                snapshot.forEach(docSnap => cloudCatalogs.push(docSnap.data()));
+                window.pdfCatalogs = cloudCatalogs;
+                localStorage.setItem('m_pdf_catalogs', JSON.stringify(cloudCatalogs));
+                if (typeof window.renderPdfCatalogExplorer === 'function') {
+                    window.renderPdfCatalogExplorer();
+                }
+                isInitialCatalogsLoaded = true;
+            } else {
+                if (!isInitialCatalogsLoaded && window.pdfCatalogs && window.pdfCatalogs.length > 0) {
+                    window.pdfCatalogs.forEach(c => {
+                        setDoc(doc(db, "catalogs", String(c.id)), JSON.parse(JSON.stringify(c)));
+                    });
+                    isInitialCatalogsLoaded = true;
+                }
+            }
+        });
     </script>
 
     <script>
@@ -1819,6 +2207,437 @@
             adminPhone: "01029190615",
             footerRights: "حقوق الملكية وتطوير المنصة الرقمية © Mohamed Nazih (01029190615)"
         };
+
+        // --- PDF Catalog & File Explorer State & Logic ---
+        let pdfCatalogs = JSON.parse(localStorage.getItem('m_pdf_catalogs')) || [
+            { id: 'cat-f-1', title: 'استنسل', category: 'استنسل', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-2', title: 'استيكر زجاج مصنفر', category: 'استيكر زجاج مصنفر', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-3', title: 'استيكر زجاجي وخشابي وحراري', category: 'استيكر زجاجي وخشابي وحراري', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-4', title: 'اكسسوارات شيبورد', category: 'اكسسوارات شيبورد', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-5', title: 'بانوهات + وزره PS', category: 'بانوهات + وزره PS', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-6', title: 'بديل الحجر', category: 'بديل الحجر', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-7', title: 'بديل خسب MDF', category: 'بديل خسب MDF', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-8', title: 'بديل خشب PS', category: 'بديل خشب PS', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-9', title: 'بديل خشب PVC', category: 'بديل خشب PVC', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-10', title: 'بويات بدهانات', category: 'بويات بدهانات', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-11', title: 'حدايد ومستلزمات', category: 'حدايد ومستلزمات', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-f-12', title: 'أدوات ومعدات', category: 'أدوات ومعدات', type: 'folder', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+
+            // Seed items inside 'استنسل'
+            { id: 'cat-p-1', title: 'استنسل مقاس 20 * 30', category: 'استنسل', type: 'pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-p-2', title: 'استنسل مقاس 40 * 60', category: 'استنسل', type: 'pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-p-3', title: 'استنسل مقاس 60 * 100', category: 'استنسل', type: 'pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+
+            // Seed items inside 'استيكر زجاج مصنفر'
+            { id: 'cat-i-1', title: 'LS 001', category: 'استيكر زجاج مصنفر', type: 'image', url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-i-2', title: 'LS 003', category: 'استيكر زجاج مصنفر', type: 'image', url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-i-3', title: 'LS 004', category: 'استيكر زجاج مصنفر', type: 'image', url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-i-4', title: 'LS 006', category: 'استيكر زجاج مصنفر', type: 'image', url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-i-5', title: 'LS 007', category: 'استيكر زجاج مصنفر', type: 'image', url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80', updatedAt: '٧ أكتوبر ٢٠٢٥' },
+            { id: 'cat-i-6', title: 'MX 07', category: 'استيكر زجاج مصنفر', type: 'image', url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80', updatedAt: '٧ أكتوبر ٢٠٢٥' }
+        ];
+        window.pdfCatalogs = pdfCatalogs;
+
+        let currentPdfFolder = null;
+        let currentPdfViewMode = localStorage.getItem('m_pdf_view_mode') || 'list';
+        let currentPdfSort = 'name';
+        let currentPdfSearchQuery = '';
+        let currentPdfExplorerTab = 'files';
+
+        function savePdfCatalogs() {
+            localStorage.setItem('m_pdf_catalogs', JSON.stringify(pdfCatalogs));
+            window.pdfCatalogs = pdfCatalogs;
+        }
+
+        function setPdfViewMode(mode) {
+            currentPdfViewMode = mode;
+            localStorage.setItem('m_pdf_view_mode', mode);
+            renderPdfCatalogExplorer();
+        }
+
+        function handlePdfCatalogBack() {
+            if (currentPdfFolder !== null) {
+                currentPdfFolder = null;
+                renderPdfCatalogExplorer();
+            } else {
+                if (currentMode === 'admin') showAdminSection('dashboard');
+                else if (currentMode === 'vendor') showVendorSection('products');
+                else showStoreHome();
+            }
+        }
+
+        function renderPdfCatalogExplorer() {
+            const containers = ['adminPdfExplorerContainer', 'vendorPdfExplorerContainer', 'customerPdfExplorerContainer'];
+            
+            let itemsToDisplay = [];
+            
+            if (currentPdfFolder === null) {
+                itemsToDisplay = pdfCatalogs.filter(item => {
+                    if (item.type === 'folder') return true;
+                    return !item.category || item.category === 'عام';
+                });
+            } else {
+                itemsToDisplay = pdfCatalogs.filter(item => item.category === currentPdfFolder && item.type !== 'folder');
+            }
+
+            if (currentPdfSearchQuery.trim() !== '') {
+                const q = currentPdfSearchQuery.toLowerCase().trim();
+                itemsToDisplay = pdfCatalogs.filter(item => item.title.toLowerCase().includes(q));
+            }
+
+            if (currentPdfSort === 'name') {
+                itemsToDisplay.sort((a, b) => a.title.localeCompare(b.title, 'ar'));
+            }
+
+            const rootTitle = siteSettings.storeName ? `منتجات ${siteSettings.storeName.split(' ')[0]}` : 'منتجات ملكاوي جروب';
+            const displayTitle = currentPdfFolder ? `${rootTitle} > ${currentPdfFolder}` : rootTitle;
+
+            let html = `
+                <div class="pdf-explorer-wrapper shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2 bg-white p-3 rounded-4 border">
+                        <div class="d-flex align-items-center gap-2">
+                            ${currentPdfFolder ? `<button class="btn btn-sm btn-light border fw-bold" onclick="currentPdfFolder=null; renderPdfCatalogExplorer();"><i class="fa-solid fa-arrow-right me-1"></i> المجلد الرئيسي</button>` : ''}
+                            <h6 class="fw-bold mb-0 text-dark fs-6"><i class="fa-solid fa-folder text-warning me-2"></i> ${displayTitle}</h6>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <input type="text" class="form-control form-control-sm" style="width: 180px;" placeholder="بحث في الكتالوجات..." value="${currentPdfSearchQuery}" oninput="currentPdfSearchQuery=this.value; renderPdfCatalogExplorer();">
+                            <div class="btn-group btn-group-sm">
+                                <button class="pdf-view-toggle-btn ${currentPdfViewMode === 'grid' ? 'active' : ''}" onclick="setPdfViewMode('grid')" title="عرض شبكي"><i class="fa-solid fa-border-all"></i></button>
+                                <button class="pdf-view-toggle-btn ${currentPdfViewMode === 'list' ? 'active' : ''}" onclick="setPdfViewMode('list')" title="عرض قائمة"><i class="fa-solid fa-list-ul"></i></button>
+                            </div>
+                            <select class="form-select form-select-sm" style="width: 110px;" onchange="currentPdfSort=this.value; renderPdfCatalogExplorer();">
+                                <option value="name" ${currentPdfSort === 'name' ? 'selected' : ''}>الاسم ↑</option>
+                                <option value="date" ${currentPdfSort === 'date' ? 'selected' : ''}>التاريخ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="${currentPdfViewMode === 'grid' ? 'row g-3' : 'd-flex flex-column'}">
+            `;
+
+            if (itemsToDisplay.length === 0) {
+                html += `<div class="text-center py-5 text-muted bg-white rounded-4 border"><i class="fa-solid fa-folder-open fs-1 mb-2 opacity-50"></i><p class="fw-bold mb-0">لا توجد ملفات أو كتالوجات في هذا المجلد حالياً.</p></div>`;
+            } else {
+                itemsToDisplay.forEach(item => {
+                    const isFolder = item.type === 'folder';
+                    const isPdf = item.type === 'pdf';
+                    const isImage = item.type === 'image';
+
+                    let iconHtml = '';
+                    if (isFolder) {
+                        iconHtml = `<div class="pdf-icon-box-folder"><i class="fa-solid fa-folder"></i></div>`;
+                    } else if (isPdf) {
+                        iconHtml = `<div class="pdf-icon-box-pdf">PDF</div>`;
+                    } else {
+                        iconHtml = `<div class="pdf-icon-box-image"><i class="fa-solid fa-image"></i></div>`;
+                    }
+
+                    const subTitleText = item.updatedAt ? `تم التعديل ${item.updatedAt}` : 'تم التعديل ٧ أكتوبر ٢٠٢٥';
+
+                    if (currentPdfViewMode === 'grid') {
+                        html += `
+                            <div class="col-6 col-md-4 col-lg-3">
+                                <div class="pdf-item-card grid-mode" onclick="handlePdfItemClick('${item.id}')">
+                                    <div class="d-flex align-items-center justify-content-between w-100 mb-2">
+                                        ${iconHtml}
+                                        <div class="dropdown" onclick="event.stopPropagation()">
+                                            <button class="btn btn-sm text-secondary border-0 p-1" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm small">
+                                                <li><a class="dropdown-item fw-bold" href="javascript:void(0)" onclick="handlePdfItemClick('${item.id}')"><i class="fa-solid fa-eye me-1 text-primary"></i> ${isFolder ? 'فتح المجلد' : 'استعراض المعاينة'}</a></li>
+                                                ${!isFolder && item.url ? `<li><a class="dropdown-item fw-bold" href="${item.url}" target="_blank" download><i class="fa-solid fa-download me-1 text-danger"></i> تحميل الملف</a></li>` : ''}
+                                                ${!isFolder ? `<li><a class="dropdown-item fw-bold" href="javascript:void(0)" onclick="sharePdfOnWhatsapp('${item.title}', '${item.url || ''}')"><i class="fa-brands fa-whatsapp me-1 text-success"></i> مشاركة عبر الواتساب</a></li>` : ''}
+                                                ${(currentMode === 'admin' || currentMode === 'vendor') ? `
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item fw-bold text-dark" href="javascript:void(0)" onclick="openEditPdfModal('${item.id}')"><i class="fa-solid fa-pen-to-square me-1 text-warning"></i> تعديل / تغيير الكتالوج</a></li>
+                                                    <li><a class="dropdown-item fw-bold text-danger" href="javascript:void(0)" onclick="deletePdfCatalogItem('${item.id}')"><i class="fa-solid fa-trash me-1"></i> حذف العنصر</a></li>
+                                                ` : ''}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="pdf-item-title text-truncate" title="${item.title}">${item.title}</div>
+                                        <div class="pdf-item-date"><i class="fa-solid fa-clock me-1"></i> ${subTitleText}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <div class="pdf-item-card" onclick="handlePdfItemClick('${item.id}')">
+                                <div class="d-flex align-items-center gap-3 overflow-hidden">
+                                    ${iconHtml}
+                                    <div class="overflow-hidden">
+                                        <div class="pdf-item-title text-truncate">${item.title}</div>
+                                        <div class="pdf-item-date"><i class="fa-solid fa-user-group me-1"></i> ${subTitleText}</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown" onclick="event.stopPropagation()">
+                                    <button class="btn btn-sm text-secondary border-0 p-2 fs-6" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm small">
+                                        <li><a class="dropdown-item fw-bold" href="javascript:void(0)" onclick="handlePdfItemClick('${item.id}')"><i class="fa-solid fa-eye me-1 text-primary"></i> ${isFolder ? 'فتح المجلد' : 'استعراض المعاينة'}</a></li>
+                                        ${!isFolder && item.url ? `<li><a class="dropdown-item fw-bold" href="${item.url}" target="_blank" download><i class="fa-solid fa-download me-1 text-danger"></i> تحميل الملف</a></li>` : ''}
+                                        ${!isFolder ? `<li><a class="dropdown-item fw-bold" href="javascript:void(0)" onclick="sharePdfOnWhatsapp('${item.title}', '${item.url || ''}')"><i class="fa-brands fa-whatsapp me-1 text-success"></i> مشاركة عبر الواتساب</a></li>` : ''}
+                                        ${(currentMode === 'admin' || currentMode === 'vendor') ? `
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item fw-bold text-dark" href="javascript:void(0)" onclick="openEditPdfModal('${item.id}')"><i class="fa-solid fa-pen-to-square me-1 text-warning"></i> تعديل / تغيير الكتالوج</a></li>
+                                            <li><a class="dropdown-item fw-bold text-danger" href="javascript:void(0)" onclick="deletePdfCatalogItem('${item.id}')"><i class="fa-solid fa-trash me-1"></i> حذف العنصر</a></li>
+                                        ` : ''}
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            html += `
+                    </div>
+
+                    <div class="d-flex justify-content-around align-items-center bg-white rounded-4 p-2 mt-4 border shadow-sm">
+                        <a href="javascript:void(0)" class="pdf-explorer-nav-tab ${currentPdfExplorerTab==='files'?'active':''}" onclick="currentPdfExplorerTab='files'; renderPdfCatalogExplorer();">
+                            <i class="fa-solid fa-folder fs-5"></i>
+                            <span>الملفات</span>
+                        </a>
+                        <a href="javascript:void(0)" class="pdf-explorer-nav-tab ${currentPdfExplorerTab==='shared'?'active':''}" onclick="currentPdfExplorerTab='shared'; renderPdfCatalogExplorer();">
+                            <i class="fa-solid fa-user-group fs-5"></i>
+                            <span>العناصر المشتركة</span>
+                        </a>
+                        <a href="javascript:void(0)" class="pdf-explorer-nav-tab ${currentPdfExplorerTab==='starred'?'active':''}" onclick="currentPdfExplorerTab='starred'; renderPdfCatalogExplorer();">
+                            <i class="fa-solid fa-star fs-5 text-warning"></i>
+                            <span>المميزة بنجمة</span>
+                        </a>
+                        <a href="javascript:void(0)" class="pdf-explorer-nav-tab ${currentPdfExplorerTab==='home'?'active':''}" onclick="currentPdfFolder=null; currentPdfExplorerTab='home'; renderPdfCatalogExplorer();">
+                            <i class="fa-solid fa-house fs-5 text-primary"></i>
+                            <span>الرئيسية</span>
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            containers.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = html;
+            });
+        }
+        window.renderPdfCatalogExplorer = renderPdfCatalogExplorer;
+
+        function handlePdfItemClick(id) {
+            const item = pdfCatalogs.find(i => i.id === id);
+            if (!item) return;
+
+            if (item.type === 'folder') {
+                currentPdfFolder = item.category || item.title;
+                renderPdfCatalogExplorer();
+            } else if (item.type === 'pdf' || item.type === 'image') {
+                openPdfViewerModal(item.url, item.title);
+            }
+        }
+
+        function openPdfViewerModal(url, title) {
+            document.getElementById('pdfViewerModalTitle').innerText = title || "استعراض ومعاينة الملف (PDF)";
+            const iframe = document.getElementById('pdfViewerIframe');
+            const dlBtn = document.getElementById('pdfViewerDownloadBtn');
+            const waBtn = document.getElementById('pdfViewerWaBtn');
+
+            iframe.src = url || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
+            dlBtn.href = url || '#';
+            dlBtn.download = (title || 'الكتالوج') + '.pdf';
+
+            waBtn.onclick = function() {
+                sharePdfOnWhatsapp(title, url);
+            };
+
+            const modal = new bootstrap.Modal(document.getElementById('pdfViewerModal'));
+            modal.show();
+        }
+
+        function sharePdfOnWhatsapp(title, url) {
+            const msg = `مرحباً، أرسل لك رابط الكتالوج/الملف الخاص بـ (${title}):\n${url && !url.startsWith('data:') ? url : 'يمكنك استعراضه مباشرة بالموقع'}`;
+            sendWhatsAppMessage(siteSettings.adminPhone, msg);
+        }
+
+        function openUploadPdfModal() {
+            populateFolderDropdown();
+            const modal = new bootstrap.Modal(document.getElementById('uploadPdfModal'));
+            modal.show();
+        }
+
+        function openAddFolderModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addFolderModal'));
+            modal.show();
+        }
+
+        function populateFolderDropdown() {
+            const sel = document.getElementById('pdfFolderSelect');
+            if (!sel) return;
+            const folders = pdfCatalogs.filter(i => i.type === 'folder');
+            let opts = `<option value="عام">مجلد عام</option>`;
+            folders.forEach(f => {
+                opts += `<option value="${f.category}" ${currentPdfFolder === f.category ? 'selected' : ''}>${f.title}</option>`;
+            });
+            sel.innerHTML = opts;
+        }
+
+        function handleUploadPdfSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('pdfTitleInput').value.trim();
+            const folder = document.getElementById('pdfFolderSelect').value;
+            const type = document.getElementById('pdfTypeSelect').value;
+            const fileInput = document.getElementById('pdfFileInput');
+            const urlInput = document.getElementById('pdfUrlInput').value.trim();
+
+            if (!title) { alert("يرجى إدخال اسم الملف / الكتالوج!"); return; }
+
+            const newItem = {
+                id: 'cat-file-' + Date.now(),
+                title: title,
+                category: folder,
+                type: type,
+                url: urlInput || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+                updatedAt: 'اليوم'
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    newItem.url = evt.target.result;
+                    finishSaveItem(newItem);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                finishSaveItem(newItem);
+            }
+        }
+
+        function finishSaveItem(newItem) {
+            pdfCatalogs.unshift(newItem);
+            savePdfCatalogs();
+            if (window.syncCatalogToCloud) window.syncCatalogToCloud(newItem);
+            renderPdfCatalogExplorer();
+
+            const modalEl = document.getElementById('uploadPdfModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+
+            document.getElementById('uploadPdfForm').reset();
+            alert("تم إرفاق الكتالوج وحفظه بنجاح!");
+        }
+
+        function handleAddFolderSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('folderTitleInput').value.trim();
+            if (!title) return;
+
+            const newFolder = {
+                id: 'cat-f-' + Date.now(),
+                title: title,
+                category: title,
+                type: 'folder',
+                updatedAt: 'اليوم'
+            };
+
+            pdfCatalogs.unshift(newFolder);
+            savePdfCatalogs();
+            if (window.syncCatalogToCloud) window.syncCatalogToCloud(newFolder);
+            renderPdfCatalogExplorer();
+
+            const modalEl = document.getElementById('addFolderModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+
+            document.getElementById('addFolderForm').reset();
+            alert("تم إنشاء المجلد الجديد بنجاح!");
+        }
+
+        function openEditPdfModal(id) {
+            const item = pdfCatalogs.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('editPdfItemId').value = item.id;
+            document.getElementById('editPdfTitleInput').value = item.title;
+            document.getElementById('editPdfTypeSelect').value = item.type || 'pdf';
+            document.getElementById('editPdfUrlInput').value = item.url && !item.url.startsWith('data:') ? item.url : '';
+            document.getElementById('editPdfFileInput').value = '';
+
+            const sel = document.getElementById('editPdfFolderSelect');
+            if (sel) {
+                const folders = pdfCatalogs.filter(i => i.type === 'folder');
+                let opts = `<option value="عام">مجلد عام</option>`;
+                folders.forEach(f => {
+                    opts += `<option value="${f.category}" ${item.category === f.category ? 'selected' : ''}>${f.title}</option>`;
+                });
+                sel.innerHTML = opts;
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('editPdfModal'));
+            modal.show();
+        }
+
+        function handleEditPdfSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('editPdfItemId').value;
+            const item = pdfCatalogs.find(i => i.id === id);
+            if (!item) return;
+
+            const title = document.getElementById('editPdfTitleInput').value.trim();
+            const folder = document.getElementById('editPdfFolderSelect').value;
+            const type = document.getElementById('editPdfTypeSelect').value;
+            const fileInput = document.getElementById('editPdfFileInput');
+            const urlInput = document.getElementById('editPdfUrlInput').value.trim();
+
+            if (!title) { alert("يرجى إدخال اسم الكتالوج!"); return; }
+
+            item.title = title;
+            item.category = folder;
+            item.type = type;
+            item.updatedAt = 'تم التعديل حديثاً';
+
+            if (urlInput) {
+                item.url = urlInput;
+            }
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    item.url = evt.target.result;
+                    finishUpdatePdfItem(item);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                finishUpdatePdfItem(item);
+            }
+        }
+
+        function finishUpdatePdfItem(item) {
+            savePdfCatalogs();
+            if (window.syncCatalogToCloud) window.syncCatalogToCloud(item);
+            renderPdfCatalogExplorer();
+
+            const modalEl = document.getElementById('editPdfModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+
+            alert("تم تعديل بيانات وملف الكتالوج وتحديثه بنجاح!");
+        }
+
+        function deletePdfCatalogItem(id) {
+            if (confirm("هل أنت تأكد من حذف هذا الكتالوج / المجلد بالكامل؟")) {
+                pdfCatalogs = pdfCatalogs.filter(i => i.id !== id);
+                savePdfCatalogs();
+                if (window.deleteCatalogFromCloud) window.deleteCatalogFromCloud(id);
+                renderPdfCatalogExplorer();
+                alert("تم حذف العنصر بنجاح!");
+            }
+        }
+
+        function showCustomerPdfCatalog() {
+            closeSidebarMobile();
+            document.querySelectorAll('.store-subview').forEach(el => el.style.display = 'none');
+            const page = document.getElementById('storePdfCatalogPage');
+            if (page) page.style.display = 'block';
+            renderPdfCatalogExplorer();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         // قائمة التجار والمتاجر المشتركة في المنصة (Tenants / Multi-Vendor)
         let tenants = JSON.parse(localStorage.getItem('m_tenants')) || [
@@ -2276,6 +3095,8 @@
                 renderVendorOrders();
             } else if (secId === 'settings') {
                 loadVendorSettings();
+            } else if (secId === 'pdfCatalog') {
+                renderPdfCatalogExplorer();
             }
         }
 
@@ -3338,6 +4159,7 @@
             if(secId === 'archive') switchArchiveTab('daily');
             if(secId === 'addProduct') { populateCategorySelects(); renderAdminProductManage(); }
             if(secId === 'siteSettings') applySiteSettings();
+            if(secId === 'pdfCatalog') renderPdfCatalogExplorer();
         }
 
         // Cart Operations
