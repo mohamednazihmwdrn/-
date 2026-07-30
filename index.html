@@ -119,17 +119,19 @@
         /* Subcategories Links */
         .sub-cat-btn {
             display: block;
-            padding: 8px 15px 8px 30px;
-            color: #475569;
+            padding: 8px 20px 8px 10px;
+            color: #1e293b;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            font-weight: 500;
             border-radius: 6px;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
+            margin-bottom: 2px;
         }
         .sub-cat-btn:hover, .sub-cat-btn.active {
-            background-color: #e2e8f0;
-            color: var(--accent-color);
-            font-weight: bold;
+            background-color: #dbeafe;
+            color: #1d4ed8;
+            font-weight: 700;
         }
 
         /* Metric KPI Cards */
@@ -269,16 +271,18 @@
 
         /* Main Footer Styling - Compact & Modern Horizontal Layout */
         .site-footer {
-            background-color: var(--primary-color);
-            color: #94a3b8;
-            padding-top: 15px;
-            padding-bottom: 15px;
-            border-top: 2px solid var(--accent-color);
-            font-size: 0.82rem;
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding-top: 16px;
+            padding-bottom: 16px;
+            border-top: 2px solid #38bdf8;
+            font-size: 0.85rem;
         }
-        .site-footer h6 { color: #ffffff; font-weight: 700; font-size: 0.88rem; margin-bottom: 0; }
-        .site-footer a { color: #cbd5e1; text-decoration: none; transition: color 0.2s; }
-        .site-footer a:hover { color: #38bdf8; }
+        .site-footer h6 { color: #ffffff !important; font-weight: 700; font-size: 0.9rem; margin-bottom: 0; }
+        .site-footer a { color: #ffffff !important; text-decoration: none; transition: color 0.2s; }
+        .site-footer a:hover { color: #fbbf24 !important; text-decoration: underline; }
+        .site-footer a.text-warning { color: #fbbf24 !important; }
+        .site-footer .text-muted, .site-footer .text-secondary { color: #cbd5e1 !important; }
 
         /* Sidebar Backdrop for Mobile Touch UI - NEVER display backdrop on Desktop (min-width: 992px) */
         .sidebar-backdrop {
@@ -749,6 +753,9 @@
                             <span class="badge bg-secondary" id="productsCountBadge">0 منتج</span>
                         </div>
 
+                        <!-- شريط البانر التوضيحي/الإعلاني لقسم المتجر الحالي -->
+                        <div id="storeHeaderBannerArea" class="mb-3"></div>
+
                         <div class="row g-2 g-md-3 mb-5" id="publicProductsContainer"></div>
                     </div>
 
@@ -757,6 +764,9 @@
                         <button class="btn-back-global mb-3" onclick="showStoreHome()">
                             <i class="fa-solid fa-arrow-right"></i> الرجوع للكتالوج
                         </button>
+                        
+                        <!-- شريط البانر التوضيحي/الإعلاني لهيدر صفحة المنتج -->
+                        <div id="detailHeaderBannerArea" class="mb-3"></div>
                         <div class="card p-3 p-md-4 shadow-sm border-0 mb-4">
                             <div class="row g-4">
                                 <div class="col-md-5">
@@ -849,6 +859,10 @@
                                 </h5>
                             </div>
                         </div>
+                        
+                        <!-- شريط البانر التوضيحي/الإعلاني لهيدر مكتبة الكتالوجات -->
+                        <div id="pdfHeaderBannerArea" class="mb-3"></div>
+
                         <div id="customerPdfExplorerContainer"></div>
                     </div>
 
@@ -861,8 +875,8 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <i class="fa-solid fa-cubes text-warning fs-5"></i>
                                     <div>
-                                        <h6 id="footerStoreTitle" class="mb-0">مؤسسة الاخوة للحدايد والبويات</h6>
-                                        <span class="text-muted style-sub" style="font-size:0.75rem;">منصة التجارة المتكاملة وإدارة المتاجر</span>
+                                        <h6 id="footerStoreTitle" class="mb-0 text-white fw-bold">مؤسسة الاخوة للحدايد والبويات</h6>
+                                        <span class="text-white-50 style-sub" style="font-size:0.75rem;">منصة التجارة المتكاملة وإدارة المتاجر</span>
                                     </div>
                                 </div>
 
@@ -871,19 +885,23 @@
                                     <a href="javascript:void(0)" class="fw-bold text-warning" onclick="openVendorModal()">
                                         <i class="fa-solid fa-rocket me-1"></i> أنشئ متجرك بااشتراك شهري
                                     </a>
-                                    <span class="text-secondary opacity-50">|</span>
-                                    <a href="javascript:void(0)" onclick="openVendorModal()">
-                                        <i class="fa-solid fa-tags me-1"></i> خطط الأسعار
+                                    <span class="text-white-50 opacity-50">|</span>
+                                    <a href="javascript:void(0)" class="fw-bold text-white" onclick="openPricingPlansModal()">
+                                        <i class="fa-solid fa-tags me-1 text-warning"></i> خطط الأسعار
                                     </a>
-                                    <span class="text-secondary opacity-50">|</span>
-                                    <a href="javascript:void(0)" onclick="openCartModal()">متابعة الطلبات</a>
-                                    <span class="text-secondary opacity-50">|</span>
-                                    <a href="javascript:void(0)" onclick="alert('شروط الخدمة: المنصة تتيح للتاجر نشر المنتجات وإدارة المبيعات وفق اشتراك شهري محدد.')">الشروط والخصوصية</a>
+                                    <span class="text-white-50 opacity-50">|</span>
+                                    <a href="javascript:void(0)" class="fw-bold text-white" onclick="openCartModal()">
+                                        <i class="fa-solid fa-truck-fast me-1 text-info"></i> متابعة الطلبات
+                                    </a>
+                                    <span class="text-white-50 opacity-50">|</span>
+                                    <a href="javascript:void(0)" class="fw-bold text-white" onclick="openTermsPrivacyModal()">
+                                        <i class="fa-solid fa-shield-halved me-1 text-info"></i> الشروط والخصوصية
+                                    </a>
                                 </div>
 
                                 <!-- القسم الثالث: حقوق الملكية -->
                                 <div class="d-flex align-items-center gap-2">
-                                    <span id="footerRightsDisplay" class="text-muted ms-2" style="font-size:0.75rem;">حقوق الملكية وتطوير المنصة الرقمية © Mohamed Nazih (01029190615)</span>
+                                    <span id="footerRightsDisplay" class="text-white-50 ms-2" style="font-size:0.75rem;">حقوق الملكية وتطوير المنصة الرقمية © Mohamed Nazih (01029190615)</span>
                                 </div>
 
                             </div>
@@ -1279,7 +1297,7 @@
                                 <input type="text" id="setStoreName" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-bold">الشريط الإعلاني العلوي</label>
+                                <label class="form-label fw-bold">الشريط الإعلاني العلوي العام</label>
                                 <input type="text" id="setAnnouncement" class="form-control" required>
                             </div>
                             <div class="mb-3">
@@ -1290,8 +1308,75 @@
                                 <label class="form-label fw-bold">حقوق الملكية (الفوتر)</label>
                                 <input type="text" id="setFooterRights" class="form-control" required>
                             </div>
-                            <button type="submit" class="btn btn-danger fw-bold w-100"><i class="fa-solid fa-floppy-disk me-1"></i> حفظ وتطبيق الإعدادات</button>
+                            <button type="submit" class="btn btn-danger fw-bold w-100"><i class="fa-solid fa-floppy-disk me-1"></i> حفظ وتطبيق الإعدادات العامة</button>
                         </form>
+                    </div>
+
+                    <!-- بطاقة إدارة بانرات وإعلانات الهيدر للأقسام والصفحات -->
+                    <div class="card border-0 shadow-sm p-3 p-md-4 mt-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="fw-bold text-primary mb-0 fs-6">
+                                <i class="fa-solid fa-rectangle-ad me-2 text-warning"></i> إدارة بانرات وإعلانات الهيدر للأقسام والصفحات (Section Header Banners)
+                            </h6>
+                            <span class="badge bg-warning text-dark fw-bold">تحكم المالك</span>
+                        </div>
+                        <p class="text-muted small mb-3">
+                            يمكنك من هنا كتابة إعلان أو توضيح أو ملاحظة مخصصة في هيدر كل قسم أو صفحة يدخل إليها العملاء فورياً.
+                        </p>
+                        <form id="sectionBannerForm" onsubmit="saveSectionBannerFromForm(event)">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">اختر القسم أو الصفحة المطلوبة</label>
+                                    <select id="bannerTargetSelect" class="form-select" onchange="loadSelectedBannerToForm()">
+                                        <option value="all">🌐 الصفحة الرئيسية (كافة المنتجات)</option>
+                                        <option value="popular">🔥 قسم المنتجات الأكثر طلباً</option>
+                                        <option value="detail">📌 صفحة تفاصيل المنتج</option>
+                                        <option value="pdf">📄 قسم الكتالوجات والملفات (PDF Explorer)</option>
+                                        <option value="tracking">📦 صفحة متابعة الطلبات والفواتير</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">لون وثيم شريط البانر</label>
+                                    <select id="bannerColorSelect" class="form-select">
+                                        <option value="alert-warning">🟨 أصفر تنبيهي / عروض (Warning)</option>
+                                        <option value="alert-primary">🟦 أزرق مميز (Primary)</option>
+                                        <option value="alert-success">🟩 أخضر نجاح / إعلان (Success)</option>
+                                        <option value="alert-info">🟦 أزرق سماوي توضيحي (Info)</option>
+                                        <option value="alert-danger">🟥 أحمر تنبيه خصم (Danger)</option>
+                                        <option value="alert-dark">⬛ أسود فخم (Dark)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">أيقونة البانر</label>
+                                    <select id="bannerIconSelect" class="form-select">
+                                        <option value="fa-bullhorn">📢 مكبر صوت (إعلان)</option>
+                                        <option value="fa-bell">🔔 جرس (تنبيه)</option>
+                                        <option value="fa-circle-info">ℹ️ معلومة (توضيح)</option>
+                                        <option value="fa-fire">🔥 نار (عروض سريعة)</option>
+                                        <option value="fa-tag">🏷️ تايم / خصم</option>
+                                        <option value="fa-star">⭐ نجمة (مميز)</option>
+                                        <option value="fa-truck-fast">🚚 شحن وتوصيل</option>
+                                        <option value="fa-shield-halved">🛡️ حماية وضمان</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small">نص الإعلان / التوضيح في هيدر القسم</label>
+                                    <textarea id="bannerTextInput" class="form-control" rows="2" placeholder="اكتب نص الإعلان أو التوضيح الذي يظهر للزائر في هيدر هذا القسم..." required></textarea>
+                                </div>
+                                <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="bannerEnabledToggle" checked>
+                                        <label class="form-check-label fw-bold small text-dark" for="bannerEnabledToggle">تفعيل إظهار البانر في هيدر هذا القسم</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary fw-bold px-4"><i class="fa-solid fa-floppy-disk me-1"></i> حفظ وتطبيق بانر القسم</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="mt-4 border-top pt-3">
+                            <h6 class="fw-bold text-dark mb-2 small"><i class="fa-solid fa-list-check me-1"></i> قائمة البانرات الحالية المخصصة للأقسام:</h6>
+                            <div id="sectionBannersSummaryList" class="d-flex flex-column gap-2"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -1615,9 +1700,9 @@
                                     <div class="col-md-12">
                                         <label class="form-label fw-bold">اختر خطة الاشتراك الشهري</label>
                                         <select id="vPlan" class="form-select" required>
-                                            <option value="الباقة الأساسية (199 ج.م / شهرياً)">الباقة الأساسية (199 ج.م / شهرياً) - حتى 50 منتج</option>
-                                            <option value="الباقة الاحترافية (399 ج.م / شهرياً)">الباقة الاحترافية (399 ج.م / شهرياً) - منتجات لا محدودة</option>
-                                            <option value="باقة المؤسسات (699 ج.م / شهرياً)">باقة المؤسسات (699 ج.م / شهرياً) - نطاق خاص ودعم مباشر</option>
+                                            <option value="الباقة الأساسية (569 ج.م / شهرياً)">الباقة الأساسية (569 ج.م / شهرياً) - حتى 100 منتج وكتالوجات PDF</option>
+                                            <option value="الباقة الاحترافية (989 ج.م / شهرياً)" selected>الباقة الاحترافية (989 ج.م / شهرياً) - منتجات وكتالوجات لا محدودة (الأكثر طلباً)</option>
+                                            <option value="باقة المؤسسات والشركات (1,499 ج.م / شهرياً)">باقة المؤسسات والشركات (1,499 ج.م / شهرياً) - نطاق خاص وبوابة دفع ودعم VIP</option>
                                         </select>
                                     </div>
                                 </div>
@@ -1983,6 +2068,196 @@
         </div>
     </div>
 
+    <!-- Modal خطط الأسعار والاشتراكات -->
+    <div class="modal fade" id="pricingPlansModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white p-3">
+                    <div>
+                        <h5 class="modal-title fw-bold fs-5 mb-0">
+                            <i class="fa-solid fa-tags text-warning me-2"></i> خطط الأسعار والاشتراكات الفائقة
+                        </h5>
+                        <small class="text-white-50" style="font-size:0.8rem;">اختر الخطة المناسبة لمتجرك وابدأ في عرض منتجاتك واستقبال الطلبات فوراً</small>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-3 p-md-4 bg-light">
+                    <!-- Cards Grid -->
+                    <div class="row g-3 g-lg-4 align-items-stretch">
+                        
+                        <!-- Plan 1: Basic / الانطلاق -->
+                        <div class="col-md-4">
+                            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
+                                <div class="card-header bg-white text-center py-4 border-bottom">
+                                    <span class="badge bg-secondary mb-2 px-3 py-1 fw-bold rounded-pill">للمتاجر الناشئة</span>
+                                    <h4 class="fw-bold text-dark mb-2">الباقة الأساسية</h4>
+                                    <p class="text-muted small mb-3">مثالية للبدء في تنظيم المنتجات والمبيعات</p>
+                                    <div class="d-flex align-items-baseline justify-content-center gap-1">
+                                        <span class="display-6 fw-extrabold text-primary">569</span>
+                                        <span class="fw-bold text-muted">ج.م / شهرياً</span>
+                                    </div>
+                                    <small class="text-success d-block mt-1 fw-bold"><i class="fa-solid fa-circle-check me-1"></i> أو 5,690 ج.م سنوياً (خصم شهرين)</small>
+                                </div>
+                                <div class="card-body bg-white p-3 p-md-4">
+                                    <ul class="list-unstyled mb-0 d-flex flex-column gap-2 small">
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span>لوحة تحكم متجر مستقلة بكلمة مرور</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span>إضافة حتى <strong>100 منتج</strong> متكامل</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span>إدارة الطلبات والأرشيف وطباعة الفواتير</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span>مكتبة كتالوجات PDF حتى 10 كتالوجات</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span>إرسال الطلبات والفواتير المباشرة عبر الواتساب</span></li>
+                                        <li class="d-flex align-items-center gap-2 text-muted opacity-75"><i class="fa-solid fa-xmark text-danger"></i> <span>ربط واتساب آلي تلقائي</span></li>
+                                        <li class="d-flex align-items-center gap-2 text-muted opacity-75"><i class="fa-solid fa-xmark text-danger"></i> <span>ربط نطاق ودومين خاص</span></li>
+                                    </ul>
+                                </div>
+                                <div class="card-footer bg-white border-0 p-3 text-center">
+                                    <button class="btn btn-outline-primary w-100 fw-bold py-2 rounded-3" onclick="openVendorModal('569')">
+                                        <i class="fa-solid fa-rocket me-1"></i> اشترك بالباقة الأساسية
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Plan 2: Pro / الاحترافية (Featured) -->
+                        <div class="col-md-4">
+                            <div class="card h-100 border-2 border-warning shadow rounded-4 overflow-hidden position-relative bg-white" style="transform: scale(1.02); z-index:2;">
+                                <div class="position-absolute top-0 start-50 translate-middle-x bg-warning text-dark fw-bold px-3 py-1 rounded-bottom fs-7 shadow-sm">
+                                    🔥 الأكثر طلباً وتفضيلاً
+                                </div>
+                                <div class="card-header bg-dark text-white text-center py-4 border-bottom border-warning">
+                                    <span class="badge bg-warning text-dark mb-2 px-3 py-1 fw-bold rounded-pill">للمتاجر المتطورة</span>
+                                    <h4 class="fw-bold mb-2">الباقة الاحترافية</h4>
+                                    <p class="text-white-50 small mb-3">الخيار الأمثل لمضاعفة المبيعات والتوسع</p>
+                                    <div class="d-flex align-items-baseline justify-content-center gap-1">
+                                        <span class="display-6 fw-extrabold text-warning">989</span>
+                                        <span class="fw-bold text-white-50">ج.م / شهرياً</span>
+                                    </div>
+                                    <small class="text-warning d-block mt-1 fw-bold"><i class="fa-solid fa-circle-check me-1"></i> أو 9,890 ج.م سنوياً (توفير هائل)</small>
+                                </div>
+                                <div class="card-body p-3 p-md-4">
+                                    <ul class="list-unstyled mb-0 d-flex flex-column gap-2 small">
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-circle-check text-warning"></i> <span><strong>جميع مميزات الباقة الأساسية</strong></span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-circle-check text-warning"></i> <span>إضافة منتجات وكتالوجات <strong>لا محدودة</strong></span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-circle-check text-warning"></i> <span>ربط الواتساب الآلي لإرسال الفواتير فورياً</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-circle-check text-warning"></i> <span>إحصائيات المبيعات ومؤشرات الأرباح التفاعلية</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-circle-check text-warning"></i> <span>تخصيص الهيدر والشعار والألوان بمتجرك</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-circle-check text-warning"></i> <span>دعم فني أولوية على مدار 24 ساعة</span></li>
+                                        <li class="d-flex align-items-center gap-2 text-muted opacity-75"><i class="fa-solid fa-xmark text-danger"></i> <span>نطاق ودومين خاص</span></li>
+                                    </ul>
+                                </div>
+                                <div class="card-footer bg-white border-0 p-3 text-center">
+                                    <button class="btn btn-warning w-100 fw-bold py-2 rounded-3 text-dark shadow-sm" onclick="openVendorModal('989')">
+                                        <i class="fa-solid fa-crown me-1"></i> اشترك بالباقة الاحترافية
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Plan 3: Enterprise / المؤسسات -->
+                        <div class="col-md-4">
+                            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
+                                <div class="card-header bg-white text-center py-4 border-bottom">
+                                    <span class="badge bg-primary mb-2 px-3 py-1 fw-bold rounded-pill">للشركات والمؤسسات</span>
+                                    <h4 class="fw-bold text-dark mb-2">باقة المؤسسات</h4>
+                                    <p class="text-muted small mb-3">حلول متكاملة مخصصة كلياً لعلامتك التجارية</p>
+                                    <div class="d-flex align-items-baseline justify-content-center gap-1">
+                                        <span class="display-6 fw-extrabold text-success">1,499</span>
+                                        <span class="fw-bold text-muted">ج.م / شهرياً</span>
+                                    </div>
+                                    <small class="text-success d-block mt-1 fw-bold"><i class="fa-solid fa-circle-check me-1"></i> أو 14,990 ج.م سنوياً</small>
+                                </div>
+                                <div class="card-body bg-white p-3 p-md-4">
+                                    <ul class="list-unstyled mb-0 d-flex flex-column gap-2 small">
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span><strong>جميع مميزات الباقة الاحترافية</strong></span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span>نطاق ودومين خاص باسم متجرك (yourname.com)</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span>ربط بوابة الدفع الإلكتروني المباشر (Visa/Mastercard)</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span>مساحة تخزين مفتوحة للـ High-Res PDF والكتالوجات</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span>مدير حساب خاص وتدريب كامل لفريق عملك</span></li>
+                                        <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-success"></i> <span>استضافة سحابية فائقة مع نسخ احتياطي يومي آلي</span></li>
+                                    </ul>
+                                </div>
+                                <div class="card-footer bg-white border-0 p-3 text-center">
+                                    <button class="btn btn-outline-dark w-100 fw-bold py-2 rounded-3" onclick="openVendorModal('1499')">
+                                        <i class="fa-solid fa-building me-1"></i> احصل على باقة المؤسسات
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="alert alert-info mt-4 mb-0 text-center rounded-3 small">
+                        <i class="fa-solid fa-headset me-1 fs-6"></i>
+                        هل تحتاج خطة مخصصة لحجم أعمالك أو استشارة فنية؟ تواصل مباشرة مع الإدارة والدعم الفني عبر الواتساب: 
+                        <a href="javascript:void(0)" onclick="sendWhatsAppMessage('01029190615', 'مرحباً، أود الاستفسار عن خطط أسعار واشتراكات المنصة')" class="fw-bold text-dark text-decoration-underline ms-1">01029190615</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal الشروط والخصوصية -->
+    <div class="modal fade" id="termsPrivacyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white p-3">
+                    <div>
+                        <h5 class="modal-title fw-bold fs-6 mb-0">
+                            <i class="fa-solid fa-shield-halved text-warning me-2"></i> الشروط والأحكام وسياسة الخصوصية
+                        </h5>
+                        <small class="text-white-50" style="font-size:0.75rem;">اتفاقية الاستخدام القانونية لحماية بيانات التجار والعملاء على المنصة</small>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-3 p-md-4 text-dark" style="line-height: 1.8;">
+                    
+                    <div class="card border-0 bg-light p-3 mb-3 rounded-3">
+                        <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-file-contract me-2"></i> 1. تمهيد ومقدمة الاتفاقية</h6>
+                        <p class="small text-muted mb-0">
+                            تُعد هذه الوثيقة اتفاقية قانونية ملزمة تنظيمياً بين المنصة الرقمية للتجارة وإدارة المتاجر وبين المشتركين (التجار/المؤسسات) والعملاء المستخدمين للموقع. باستخدامك للمنصة أو إنشاء متجر إلكتروني، فإنك تقر بالموافقة التامة والامتثال لكافة الشروط والسياسات المنصوص عليها هنا.
+                        </p>
+                    </div>
+
+                    <div class="card border-0 bg-light p-3 mb-3 rounded-3">
+                        <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-user-shield me-2"></i> 2. سياسة وحماية الخصوصية وتشفير البيانات</h6>
+                        <ul class="small text-muted mb-0 pe-3">
+                            <li class="mb-1">تلتزم المنصة بأعلى معايير الأمان والتشفير لحماية بيانات المشتركين والعملاء (الأسماء، أرقام الهواتف، العناوين، وسجلات الطلبات).</li>
+                            <li class="mb-1">لن يتم مشاركة، بيع، أو إتاحة أي بيانات شخصية أو تجارية لأي طرف ثالث دون موافقة كتابية صريحة.</li>
+                            <li class="mb-1">تُحفظ كافة الملفات والكتالوجات والمستندات ببيئة سحابية محمية ومؤمنة بالكامل بالتوثيق الرقمي.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card border-0 bg-light p-3 mb-3 rounded-3">
+                        <h6 class="fw-bold text-warning mb-2 text-dark"><i class="fa-solid fa-tags me-2"></i> 3. سياسة الاشتراكات والخطط والمدفوعات</h6>
+                        <ul class="small text-muted mb-0 pe-3">
+                            <li class="mb-1">تبدأ اشتراكات المتاجر من <strong>الباقة الأساسية (569 ج.م / شهرياً)</strong> وتتدرج بحسب المميزات والخدمات المتاحة.</li>
+                            <li class="mb-1">يضمن الاشتراك للتاجر تفعيل لوحة تحكم مستقلة، رفع المنتجات والكتالوجات، وإدارة المبيعات والطلبات.</li>
+                            <li class="mb-1">يحق للتاجر ترقية الباقة أو تعديل بيانات الاشتراك في أي وقت بالتواصل المباشر مع إدارة المنصة.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card border-0 bg-light p-3 mb-3 rounded-3">
+                        <h6 class="fw-bold text-danger mb-2"><i class="fa-solid fa-gavel me-2"></i> 4. حقوق الملكية والمسؤولية القانونية</h6>
+                        <ul class="small text-muted mb-0 pe-3">
+                            <li class="mb-1">يتحمل المشترك (التاجر) المسؤولية الكاملة عن صحة المنتجات، الأسعار، المواصفات والكتالوجات المعروضة بمتجره.</li>
+                            <li class="mb-1">تظل حقوق البرمجة والتصميم والهيكل الأساسي للمنصة ملكية فكرية مطلقة ومحفوظة لتطوير المنصة.</li>
+                            <li class="mb-1">تلتزم المنصة بتوفير استقرار عالي الجودة للخدمات ودعم فني متواصل للرد على الاستفسارات.</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-secondary text-center small mb-0 rounded-3">
+                        <i class="fa-solid fa-clock-rotate-left me-1"></i> تم تحديث هذه الشروط والسياسات لعام 2026 - جميع الحقوق محفوظة © Mohamed Nazih
+                    </div>
+
+                </div>
+                <div class="modal-footer bg-light p-2">
+                    <button type="button" class="btn btn-dark fw-bold px-4 rounded-3" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-check me-1"></i> موافقة وإغلاق
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
@@ -2009,12 +2284,47 @@
 
         window.firebaseDB = db;
 
+        // Safe JSON Stringify & Safe Clone to prevent circular structure errors
+        window.safeStringify = function(obj) {
+            if (obj === undefined || obj === null) return "null";
+            const cache = new WeakSet();
+            try {
+                return JSON.stringify(obj, (key, value) => {
+                    if (typeof value === 'object' && value !== null) {
+                        if (value instanceof Node || value instanceof Window || ('nodeType' in value)) {
+                            return undefined;
+                        }
+                        if (cache.has(value)) {
+                            return undefined;
+                        }
+                        cache.add(value);
+                    }
+                    if (typeof value === 'function') {
+                        return undefined;
+                    }
+                    return value;
+                });
+            } catch(e) {
+                console.warn("safeStringify caught error:", e);
+                return "{}";
+            }
+        };
+
+        window.safeClone = function(obj) {
+            if (obj === undefined || obj === null) return obj;
+            try {
+                return JSON.parse(window.safeStringify(obj));
+            } catch(e) {
+                return obj;
+            }
+        };
+
         // Cloud sync helper functions
         window.syncProductToCloud = async function(prod) {
             try {
                 if (!prod || !prod.id) return;
                 const prodRef = doc(db, "products", String(prod.id));
-                const cleanProd = JSON.parse(JSON.stringify(prod));
+                const cleanProd = window.safeClone(prod);
                 await setDoc(prodRef, cleanProd);
             } catch(err) {
                 console.error("Firebase sync product error:", err);
@@ -2035,7 +2345,7 @@
             try {
                 if (!tenant || !tenant.id) return;
                 const tRef = doc(db, "tenants", String(tenant.id));
-                await setDoc(tRef, JSON.parse(JSON.stringify(tenant)));
+                await setDoc(tRef, window.safeClone(tenant));
             } catch(err) { console.error("Firebase sync tenant error:", err); }
         };
 
@@ -2050,7 +2360,7 @@
         window.syncCategoriesToCloud = async function(cats) {
             try {
                 const cRef = doc(db, "settings", "categories");
-                await setDoc(cRef, { list: JSON.parse(JSON.stringify(cats)) });
+                await setDoc(cRef, { list: window.safeClone(cats) });
             } catch(err) { console.error("Firebase sync categories error:", err); }
         };
 
@@ -2058,14 +2368,14 @@
             try {
                 if (!order || !order.id) return;
                 const oRef = doc(db, "orders", String(order.id));
-                await setDoc(oRef, JSON.parse(JSON.stringify(order)));
+                await setDoc(oRef, window.safeClone(order));
             } catch(err) { console.error("Firebase sync order error:", err); }
         };
 
         window.syncSettingsToCloud = async function(settings) {
             try {
                 const sRef = doc(db, "settings", "site");
-                await setDoc(sRef, JSON.parse(JSON.stringify(settings)));
+                await setDoc(sRef, window.safeClone(settings));
             } catch(err) { console.error("Firebase sync settings error:", err); }
         };
 
@@ -2079,7 +2389,7 @@
                 });
                 cloudProducts.sort((a, b) => (b.id || 0) - (a.id || 0));
                 window.products = cloudProducts;
-                localStorage.setItem('m_products', JSON.stringify(window.products));
+                localStorage.setItem('m_products', window.safeStringify(window.products));
                 if (typeof window.refreshAllUI === 'function') {
                     window.refreshAllUI();
                 }
@@ -2087,7 +2397,7 @@
             } else {
                 if (!isInitialProductsLoaded && window.products && window.products.length > 0) {
                     window.products.forEach(p => {
-                        setDoc(doc(db, "products", String(p.id)), JSON.parse(JSON.stringify(p)));
+                        setDoc(doc(db, "products", String(p.id)), window.safeClone(p));
                     });
                     isInitialProductsLoaded = true;
                 }
@@ -2102,7 +2412,7 @@
                     cloudTenants.push(docSnap.data());
                 });
                 window.tenants = cloudTenants;
-                localStorage.setItem('m_tenants', JSON.stringify(window.tenants));
+                localStorage.setItem('m_tenants', window.safeStringify(window.tenants));
                 if (typeof window.refreshAllUI === 'function') {
                     window.refreshAllUI();
                 }
@@ -2110,7 +2420,7 @@
             } else {
                 if (!isInitialTenantsLoaded && window.tenants && window.tenants.length > 0) {
                     window.tenants.forEach(t => {
-                        setDoc(doc(db, "tenants", String(t.id)), JSON.parse(JSON.stringify(t)));
+                        setDoc(doc(db, "tenants", String(t.id)), window.safeClone(t));
                     });
                     isInitialTenantsLoaded = true;
                 }
@@ -2120,7 +2430,8 @@
         onSnapshot(doc(db, "settings", "categories"), (docSnap) => {
             if (docSnap.exists() && docSnap.data().list) {
                 window.categories = docSnap.data().list;
-                localStorage.setItem('m_categories', JSON.stringify(window.categories));
+                categories = docSnap.data().list;
+                localStorage.setItem('m_categories', window.safeStringify(window.categories));
                 if (typeof window.refreshAllUI === 'function') {
                     window.refreshAllUI();
                 }
@@ -2136,7 +2447,7 @@
                 });
                 cloudOrders.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
                 window.orders = cloudOrders;
-                localStorage.setItem('m_orders', JSON.stringify(window.orders));
+                localStorage.setItem('m_orders', window.safeStringify(window.orders));
                 if (typeof window.refreshAllUI === 'function') {
                     window.refreshAllUI();
                 }
@@ -2144,7 +2455,7 @@
             } else {
                 if (!isInitialOrdersLoaded && window.orders && window.orders.length > 0) {
                     window.orders.forEach(o => {
-                        setDoc(doc(db, "orders", String(o.id)), JSON.parse(JSON.stringify(o)));
+                        setDoc(doc(db, "orders", String(o.id)), window.safeClone(o));
                     });
                     isInitialOrdersLoaded = true;
                 }
@@ -2154,7 +2465,7 @@
         onSnapshot(doc(db, "settings", "site"), (docSnap) => {
             if (docSnap.exists()) {
                 window.siteSettings = docSnap.data();
-                localStorage.setItem('m_site_settings', JSON.stringify(window.siteSettings));
+                localStorage.setItem('m_site_settings', window.safeStringify(window.siteSettings));
                 if (typeof window.refreshAllUI === 'function') {
                     window.refreshAllUI();
                 }
@@ -2165,7 +2476,7 @@
             try {
                 if (!catItem || !catItem.id) return;
                 const cRef = doc(db, "catalogs", String(catItem.id));
-                await setDoc(cRef, JSON.parse(JSON.stringify(catItem)));
+                await setDoc(cRef, window.safeClone(catItem));
             } catch(e) { console.error("Firebase sync catalog error:", e); }
         };
 
@@ -2183,7 +2494,7 @@
                 const cloudCatalogs = [];
                 snapshot.forEach(docSnap => cloudCatalogs.push(docSnap.data()));
                 window.pdfCatalogs = cloudCatalogs;
-                localStorage.setItem('m_pdf_catalogs', JSON.stringify(cloudCatalogs));
+                localStorage.setItem('m_pdf_catalogs', window.safeStringify(cloudCatalogs));
                 if (typeof window.renderPdfCatalogExplorer === 'function') {
                     window.renderPdfCatalogExplorer();
                 }
@@ -2191,7 +2502,7 @@
             } else {
                 if (!isInitialCatalogsLoaded && window.pdfCatalogs && window.pdfCatalogs.length > 0) {
                     window.pdfCatalogs.forEach(c => {
-                        setDoc(doc(db, "catalogs", String(c.id)), JSON.parse(JSON.stringify(c)));
+                        setDoc(doc(db, "catalogs", String(c.id)), window.safeClone(c));
                     });
                     isInitialCatalogsLoaded = true;
                 }
@@ -2200,13 +2511,65 @@
     </script>
 
     <script>
+        // Global Safe JSON helpers
+        if (!window.safeStringify) {
+            window.safeStringify = function(obj) {
+                if (obj === undefined || obj === null) return "null";
+                const cache = new WeakSet();
+                try {
+                    return JSON.stringify(obj, (key, value) => {
+                        if (typeof value === 'object' && value !== null) {
+                            if (value instanceof Node || value instanceof Window || ('nodeType' in value)) {
+                                return undefined;
+                            }
+                            if (cache.has(value)) {
+                                return undefined;
+                            }
+                            cache.add(value);
+                        }
+                        if (typeof value === 'function') {
+                            return undefined;
+                        }
+                        return value;
+                    });
+                } catch(e) {
+                    console.warn("safeStringify error:", e);
+                    return "{}";
+                }
+            };
+        }
+
+        if (!window.safeClone) {
+            window.safeClone = function(obj) {
+                if (obj === undefined || obj === null) return obj;
+                try {
+                    return JSON.parse(window.safeStringify(obj));
+                } catch(e) {
+                    return obj;
+                }
+            };
+        }
+
         // Data Structures & Local Storage Initialization
+        let defaultSectionBanners = {
+            "all": { text: "📢 أهلاً بكم في متجرنا الرقمي! تصفح أجود مستلزمات البويات والحدايد وأدوات التشطيب بأفضل الأسعار.", color: "alert-warning", icon: "fa-bullhorn", enabled: true },
+            "بويات بدهانات": { text: "🎨 قسم البويات والدهانات: يتوفر لدينا أحدث تشكيلات سايبس وتنسيق الألوان والديكور بأعلى جودة.", color: "alert-info", icon: "fa-paint-roller", enabled: true },
+            "حدايد ومستلزمات": { text: "🔩 قسم الحدايد والمستلزمات: خصومات خاصة وتوريدات فورية للأقفال والمسامير والخوابير.", color: "alert-primary", icon: "fa-wrench", enabled: true },
+            "أدوات ومعدات": { text: "🛠️ قسم الأدوات والمعدات: أدوات يدوية وكهربائية أصلية مع ضمان الاستبدال والاسترجاع.", color: "alert-success", icon: "fa-screwdriver-wrench", enabled: true },
+            "popular": { text: "🔥 المنتجات الأكثر طلباً: تشكيلة المنتجات الأكثر مبيعاً وحصولاً على تقييمات العملاء.", color: "alert-danger", icon: "fa-fire", enabled: true },
+            "detail": { text: "📌 صفحة تفاصيل المنتج: يمكنك طلب الكميات الكبيرة أو الاستفسار مباشرة عبر الواتساب مع المبيعات.", color: "alert-dark", icon: "fa-circle-info", enabled: true },
+            "pdf": { text: "📄 قسم KETALOG PDF: استعرض ونزّل كافة الكتالوجات الفنية وملفات المواصفات مجاناً.", color: "alert-primary", icon: "fa-file-pdf", enabled: true },
+            "tracking": { text: "📦 صفحة متابعة الطلبات: استعرض فواتيرك السابقة وتتبع حالة الشحن بسهولة.", color: "alert-info", icon: "fa-truck-fast", enabled: true }
+        };
+
         let siteSettings = JSON.parse(localStorage.getItem('m_site_settings')) || {
             storeName: "مؤسسة الاخوة للحدايد والبويات",
             announcement: "🛠️ أجوَد مستلزمات الحدايد والبويات بأفضل الأسعار - طلبك يصلك للعنوان مباشرة!",
             adminPhone: "01029190615",
-            footerRights: "حقوق الملكية وتطوير المنصة الرقمية © Mohamed Nazih (01029190615)"
+            footerRights: "حقوق الملكية وتطوير المنصة الرقمية © Mohamed Nazih (01029190615)",
+            sectionBanners: defaultSectionBanners
         };
+        if(!siteSettings.sectionBanners) siteSettings.sectionBanners = defaultSectionBanners;
 
         // --- PDF Catalog & File Explorer State & Logic ---
         let pdfCatalogs = JSON.parse(localStorage.getItem('m_pdf_catalogs')) || [
@@ -2245,7 +2608,7 @@
         let currentPdfExplorerTab = 'files';
 
         function savePdfCatalogs() {
-            localStorage.setItem('m_pdf_catalogs', JSON.stringify(pdfCatalogs));
+            localStorage.setItem('m_pdf_catalogs', window.safeStringify(pdfCatalogs));
             window.pdfCatalogs = pdfCatalogs;
         }
 
@@ -2635,6 +2998,7 @@
             document.querySelectorAll('.store-subview').forEach(el => el.style.display = 'none');
             const page = document.getElementById('storePdfCatalogPage');
             if (page) page.style.display = 'block';
+            renderSectionHeaderBanner('pdf', 'pdfHeaderBannerArea');
             renderPdfCatalogExplorer();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -2824,6 +3188,12 @@
             const vSetForm = document.getElementById('vendorSettingsForm');
             if(vSetForm) vSetForm.onsubmit = saveVendorSettings;
 
+            const bannerForm = document.getElementById('sectionBannerForm');
+            if(bannerForm) bannerForm.onsubmit = saveSectionBannerFromForm;
+
+            const bannerSel = document.getElementById('bannerTargetSelect');
+            if(bannerSel) bannerSel.onchange = loadSelectedBannerToForm;
+
             // استرجاع المود والحالة الحالية عند عمل تحديث للصفحة (Refresh)
             const hash = window.location.hash.replace('#', '');
             if (hash.startsWith('sec-')) {
@@ -2857,10 +3227,206 @@
             }
         }
 
+        // --- نظام إدارة وتحديث بانرات وإعلانات الهيدر للأقسام والصفحات ---
+        function renderSectionHeaderBanner(sectionKey, containerId = 'storeHeaderBannerArea') {
+            const container = document.getElementById(containerId);
+            if(!container) return;
+
+            if(!siteSettings || !siteSettings.sectionBanners) {
+                container.innerHTML = '';
+                return;
+            }
+
+            // البحث عن البانر المخصص للقسم أو العودة للعام "all"
+            let banner = siteSettings.sectionBanners[sectionKey];
+
+            if (banner) {
+                // إذا كان البانر الخاص بالقسم معطلاً صراحةً أو خالي النص
+                if (banner.enabled === false || !banner.text || banner.text.trim() === '') {
+                    container.innerHTML = '';
+                    return;
+                }
+            } else {
+                // إذا لم يتوفر بانر خاص بهذا القسم، نتحقق من البانر العام "all"
+                if (sectionKey !== 'all' && siteSettings.sectionBanners['all'] && siteSettings.sectionBanners['all'].enabled !== false && siteSettings.sectionBanners['all'].text) {
+                    banner = siteSettings.sectionBanners['all'];
+                } else {
+                    container.innerHTML = '';
+                    return;
+                }
+            }
+
+            const alertClass = banner.color || 'alert-warning';
+            const iconClass = banner.icon || 'fa-bullhorn';
+
+            container.innerHTML = `
+                <div class="alert ${alertClass} border-0 shadow-sm d-flex align-items-center justify-content-between p-2 px-3 rounded-3 mb-2 animate__animated animate__fadeIn" id="activeHeaderBanner-${sectionKey}">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-dark text-white p-2 rounded-circle me-1"><i class="fa-solid ${iconClass} fs-6"></i></span>
+                        <div>
+                            <strong class="d-block text-dark small">إعلان وتوضيح القسم:</strong>
+                            <span class="small text-dark fw-bold">${banner.text}</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-sm ms-2" onclick="this.parentElement.remove()" title="إغلاق التوضيح"></button>
+                </div>
+            `;
+        }
+
+        function populateBannerTargetDropdown() {
+            const sel = document.getElementById('bannerTargetSelect');
+            if(!sel) return;
+
+            const currentVal = sel.value;
+            let opts = `
+                <option value="all">🌐 الصفحة الرئيسية (كافة المنتجات)</option>
+                <option value="popular">🔥 قسم المنتجات الأكثر طلباً</option>
+                <option value="detail">📌 صفحة تفاصيل المنتج</option>
+                <option value="pdf">📄 قسم الكتالوجات والملفات (PDF Explorer)</option>
+                <option value="tracking">📦 صفحة متابعة الطلبات والفواتير</option>
+            `;
+
+            const activeCats = (window.categories && window.categories.length) ? window.categories : categories;
+            if(activeCats && Array.isArray(activeCats)) {
+                activeCats.forEach(c => {
+                    opts += `<option value="${c.name}">📁 قسم: ${c.name}</option>`;
+                });
+            }
+
+            sel.innerHTML = opts;
+            if(currentVal) sel.value = currentVal;
+            loadSelectedBannerToForm();
+        }
+
+        function loadSelectedBannerToForm() {
+            const sel = document.getElementById('bannerTargetSelect');
+            if(!sel) return;
+            const targetKey = sel.value;
+            if(!siteSettings.sectionBanners) siteSettings.sectionBanners = defaultSectionBanners;
+
+            const b = siteSettings.sectionBanners[targetKey] || {
+                text: '',
+                color: 'alert-warning',
+                icon: 'fa-bullhorn',
+                enabled: true
+            };
+
+            const txtInput = document.getElementById('bannerTextInput');
+            const colorSel = document.getElementById('bannerColorSelect');
+            const iconSel = document.getElementById('bannerIconSelect');
+            const enableTgl = document.getElementById('bannerEnabledToggle');
+
+            if(txtInput) txtInput.value = b.text || '';
+            if(colorSel) colorSel.value = b.color || 'alert-warning';
+            if(iconSel) iconSel.value = b.icon || 'fa-bullhorn';
+            if(enableTgl) enableTgl.checked = b.enabled !== false;
+        }
+
+        function saveSectionBannerFromForm(e) {
+            e.preventDefault();
+            const targetKey = document.getElementById('bannerTargetSelect').value;
+            const text = document.getElementById('bannerTextInput').value.trim();
+            const color = document.getElementById('bannerColorSelect').value;
+            const icon = document.getElementById('bannerIconSelect').value;
+            const enabled = document.getElementById('bannerEnabledToggle').checked;
+
+            if(!siteSettings.sectionBanners) siteSettings.sectionBanners = {};
+
+            siteSettings.sectionBanners[targetKey] = { text, color, icon, enabled };
+
+            localStorage.setItem('m_site_settings', window.safeStringify(siteSettings));
+            if(window.syncSettingsToCloud) window.syncSettingsToCloud(siteSettings);
+
+            broadcastSync();
+            applySiteSettings();
+            renderSectionBannersSummaryList();
+
+            alert(`تم حفظ وتطبيق حالة وتفاصيل بانر الهيدر المخصص لـ (${targetKey === 'all' ? 'الكل' : targetKey}) بنجاح!`);
+        }
+
+        function toggleBannerEnabledDirectly(key) {
+            if (siteSettings && siteSettings.sectionBanners && siteSettings.sectionBanners[key]) {
+                const currentStatus = siteSettings.sectionBanners[key].enabled !== false;
+                siteSettings.sectionBanners[key].enabled = !currentStatus;
+
+                localStorage.setItem('m_site_settings', window.safeStringify(siteSettings));
+                if (window.syncSettingsToCloud) window.syncSettingsToCloud(siteSettings);
+
+                broadcastSync();
+                applySiteSettings();
+                renderSectionBannersSummaryList();
+                loadSelectedBannerToForm();
+            }
+        }
+
+        function renderSectionBannersSummaryList() {
+            const container = document.getElementById('sectionBannersSummaryList');
+            if(!container) return;
+
+            if(!siteSettings || !siteSettings.sectionBanners || Object.keys(siteSettings.sectionBanners).length === 0) {
+                container.innerHTML = `<div class="text-muted small">لا توجد بانرات مخصصة مضافة حالياً.</div>`;
+                return;
+            }
+
+            let html = '';
+            for(const [key, b] of Object.entries(siteSettings.sectionBanners)) {
+                if(!b || !b.text) continue;
+                let targetLabel = key;
+                if(key === 'all') targetLabel = 'الصفحة الرئيسية (الكل)';
+                if(key === 'popular') targetLabel = 'الأكثر طلباً';
+                if(key === 'detail') targetLabel = 'تفاصيل المنتج';
+                if(key === 'pdf') targetLabel = 'كتالوجات PDF';
+                if(key === 'tracking') targetLabel = 'متابعة الطلبات';
+
+                const isEnabled = b.enabled !== false;
+
+                html += `
+                    <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light small flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-secondary fw-bold">${targetLabel}</span>
+                            <span class="badge ${isEnabled ? 'bg-success' : 'bg-danger'}">${isEnabled ? 'مفعل' : 'معطل'}</span>
+                            <span class="text-truncate fw-semibold text-dark" style="max-width: 280px;"><i class="fa-solid ${b.icon || 'fa-bullhorn'} me-1"></i>${b.text}</span>
+                        </div>
+                        <div class="d-flex gap-1">
+                            <button type="button" class="btn btn-sm ${isEnabled ? 'btn-outline-warning' : 'btn-outline-success'} py-0 fw-bold" onclick="toggleBannerEnabledDirectly('${key}')" title="تبديل التفعيل">${isEnabled ? 'تعطيل ⏸️' : 'تفعيل ▶️'}</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary py-0 fw-bold" onclick="selectAndEditBanner('${key}')">تعديل</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger py-0 fw-bold" onclick="deleteSectionBanner('${key}')">حذف</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html || `<div class="text-muted small">لا توجد بانرات مخصصة مضافة حالياً.</div>`;
+        }
+
+        function selectAndEditBanner(key) {
+            const sel = document.getElementById('bannerTargetSelect');
+            if(sel) {
+                sel.value = key;
+                loadSelectedBannerToForm();
+                document.getElementById('sectionBannerForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function deleteSectionBanner(key) {
+            if(confirm(`هل أنت تأكد من حذف إعلان/بانر الهيدر المخصص لـ (${key})؟`)) {
+                if(siteSettings && siteSettings.sectionBanners) {
+                    delete siteSettings.sectionBanners[key];
+                    localStorage.setItem('m_site_settings', JSON.stringify(siteSettings));
+                    if(window.syncSettingsToCloud) window.syncSettingsToCloud(siteSettings);
+                    broadcastSync();
+                    applySiteSettings();
+                    renderSectionBannersSummaryList();
+                }
+            }
+        }
+
         // Site Settings Application
         function applySiteSettings() {
             const storeTitle = currentTenant ? currentTenant.storeName : siteSettings.storeName;
             const adminPhone = currentTenant ? currentTenant.phone : siteSettings.adminPhone;
+
+            if(!siteSettings.sectionBanners) siteSettings.sectionBanners = defaultSectionBanners;
 
             document.getElementById('pageTitle').innerText = storeTitle;
             document.getElementById('headerStoreName').innerText = storeTitle;
@@ -2879,6 +3445,15 @@
             document.getElementById('setAnnouncement').value = siteSettings.announcement;
             document.getElementById('setAdminPhone').value = siteSettings.adminPhone;
             document.getElementById('setFooterRights').value = siteSettings.footerRights || "حقوق الملكية وتطوير المنصة الرقمية © Mohamed Nazih (01029190615)";
+
+            // تحديث دروب داون وقائمة بانرات الهيدر في لوحة تحكم المالك
+            populateBannerTargetDropdown();
+            renderSectionBannersSummaryList();
+
+            // تحديث عرض البانرات التوضيحية في واجهة المتجر
+            renderSectionHeaderBanner('all', 'storeHeaderBannerArea');
+            renderSectionHeaderBanner('detail', 'detailHeaderBannerArea');
+            renderSectionHeaderBanner('pdf', 'pdfHeaderBannerArea');
         }
 
         // Toggle Sidebar & Mobile Backdrop
@@ -3000,6 +3575,56 @@
                 modal.show();
             }
         }
+
+        function openVendorModal(planFilter) {
+            const pricingModalEl = document.getElementById('pricingPlansModal');
+            if (pricingModalEl) {
+                const pricingModal = bootstrap.Modal.getInstance(pricingModalEl);
+                if (pricingModal) pricingModal.hide();
+            }
+
+            const modalEl = document.getElementById('vendorAuthModal');
+            if(modalEl) {
+                if (planFilter) {
+                    const vPlanSelect = document.getElementById('vPlan');
+                    if (vPlanSelect) {
+                        for (let i = 0; i < vPlanSelect.options.length; i++) {
+                            if (vPlanSelect.options[i].value.includes(planFilter)) {
+                                vPlanSelect.selectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+                const vRegTabBtn = document.getElementById('vRegTabBtn');
+                if (vRegTabBtn) {
+                    const tabInstance = new bootstrap.Tab(vRegTabBtn);
+                    tabInstance.show();
+                }
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        }
+
+        function openPricingPlansModal() {
+            const modalEl = document.getElementById('pricingPlansModal');
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        }
+
+        function openTermsPrivacyModal() {
+            const modalEl = document.getElementById('termsPrivacyModal');
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        }
+
+        window.openVendorModal = openVendorModal;
+        window.openPricingPlansModal = openPricingPlansModal;
+        window.openTermsPrivacyModal = openTermsPrivacyModal;
 
         function handleVendorLogin(e) {
             e.preventDefault();
@@ -3517,29 +4142,64 @@
         // بناء شجرة الأقسام في القائمة الجانبية للمتجر للعملاء
         function renderStoreSidebarCategories() {
             const container = document.getElementById('storeCategoriesAccordion');
+            if(!container) return;
             container.innerHTML = '';
 
-            categories.forEach((cat, index) => {
+            const catList = (window.categories && window.categories.length) ? window.categories : categories;
+            if(!catList || catList.length === 0) {
+                container.innerHTML = '<div class="text-muted small p-2 text-center">لا توجد أقسام مسجلة.</div>';
+                return;
+            }
+
+            catList.forEach((cat, index) => {
+                if (!cat || !cat.name) return;
+
+                // استخراج الأقسام الفرعية الصالحة
+                const subs = (cat && Array.isArray(cat.subCategories)) 
+                    ? cat.subCategories.filter(s => s !== null && s !== undefined && String(typeof s === 'object' ? (s.name || s.title || '') : s).trim() !== '') 
+                    : [];
+
+                const safeMainCat = String(cat.name).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                // إذا لم توجد أقسام فرعية: عرض زر عادي مباشر بدون زر تمدد (Accordion) وبدون سهم فارغ
+                if (subs.length === 0) {
+                    container.innerHTML += `
+                        <div class="mb-1">
+                            <button type="button" class="sidebar-menu-btn text-dark fw-bold w-100 border-0 bg-light rounded py-2 px-3 text-start d-flex align-items-center justify-content-between" onclick="filterByCategories('${safeMainCat}', 'all')">
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-folder text-warning me-1"></i> ${cat.name}
+                                </span>
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // إذا توجد أقسام فرعية: إنشاء زر التمدد القابل للفتح والإغلاق
                 let subHtml = '';
-                cat.subCategories.forEach(sub => {
+                subs.forEach(sub => {
+                    const subLabel = (typeof sub === 'object' && sub !== null) ? (sub.name || sub.title || String(sub)) : String(sub);
+                    const safeSub = String(subLabel).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    
                     subHtml += `
-                        <a href="javascript:void(0)" class="sub-cat-btn" onclick="filterByCategories('${cat.name}', '${sub}')">
-                            <i class="fa-solid fa-angle-left me-1 small"></i> ${sub}
+                        <a href="javascript:void(0)" class="sub-cat-btn d-flex align-items-center justify-content-between text-dark fw-semibold text-decoration-none py-2 px-2 mb-1 rounded" onclick="filterByCategories('${safeMainCat}', '${safeSub}')">
+                            <span class="d-flex align-items-center gap-2"><i class="fa-solid fa-angle-left text-primary small"></i> ${subLabel}</span>
                         </a>
                     `;
                 });
 
                 container.innerHTML += `
-                    <div class="accordion-item border-0 mb-1">
+                    <div class="accordion-item border-0 mb-1 rounded overflow-hidden">
                         <h2 class="accordion-header" id="headingCat${index}">
-                            <button class="accordion-button collapsed py-2 px-3 fw-bold fs-6" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCat${index}">
+                            <button class="accordion-button collapsed py-2 px-3 fw-bold fs-6 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCat${index}" aria-expanded="false" aria-controls="collapseCat${index}">
                                 <i class="fa-solid fa-folder text-warning me-2"></i> ${cat.name}
+                                <span class="badge bg-primary-subtle text-primary ms-auto me-1" style="font-size:0.75rem;">${subs.length}</span>
                             </button>
                         </h2>
-                        <div id="collapseCat${index}" class="accordion-collapse collapse" data-bs-parent="#storeCategoriesAccordion">
-                            <div class="accordion-body p-1 bg-light rounded">
-                                <a href="javascript:void(0)" class="sub-cat-btn fw-bold text-primary" onclick="filterByCategories('${cat.name}', 'all')">
-                                    📌 كل منتجات (${cat.name})
+                        <div id="collapseCat${index}" class="accordion-collapse collapse" aria-labelledby="headingCat${index}" data-bs-parent="#storeCategoriesAccordion">
+                            <div class="accordion-body p-2 bg-light rounded-bottom border-top">
+                                <a href="javascript:void(0)" class="sub-cat-btn fw-bold text-primary mb-1 pb-2 border-bottom d-flex align-items-center justify-content-between text-decoration-none" onclick="filterByCategories('${safeMainCat}', 'all')">
+                                    <span>📌 كل منتجات (${cat.name})</span>
                                 </a>
                                 ${subHtml}
                             </div>
@@ -3570,6 +4230,9 @@
             } else {
                 titleEl.innerHTML = `<i class="fa-solid fa-tag text-primary me-1"></i> ${mainCat} > ${subCat}`;
             }
+
+            // عرض شريط البانر المخصص للقسم في الهيدر
+            renderSectionHeaderBanner(mainCat, 'storeHeaderBannerArea');
 
             renderPublicProducts(filtered);
         }
@@ -3760,6 +4423,8 @@
 
             currentSelectedProductIndex = index;
 
+            renderSectionHeaderBanner('detail', 'detailHeaderBannerArea');
+
             document.getElementById('detailTitle').innerText = prod.title;
             document.getElementById('detailCategory').innerText = prod.category || '';
             document.getElementById('detailSubCategory').innerText = prod.subCategory || 'عام';
@@ -3908,8 +4573,10 @@
         }
 
         function showStoreHome() {
-            document.getElementById('storeDetailPage').style.display = 'none';
-            document.getElementById('storeHomePage').style.display = 'block';
+            document.querySelectorAll('.store-subview').forEach(el => el.style.display = 'none');
+            const homePage = document.getElementById('storeHomePage');
+            if(homePage) homePage.style.display = 'block';
+            renderSectionHeaderBanner('all', 'storeHeaderBannerArea');
         }
 
         function renderRelated(currentIndex) {
