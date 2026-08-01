@@ -2292,9 +2292,9 @@
             try {
                 return JSON.stringify(obj, (key, value) => {
                     if (typeof value === 'object' && value !== null) {
-                        if (value instanceof Node || value instanceof Window || ('nodeType' in value)) {
-                            return undefined;
-                        }
+                        if (typeof Node !== 'undefined' && value instanceof Node) return undefined;
+                        if (typeof Window !== 'undefined' && value instanceof Window) return undefined;
+                        if ('nodeType' in value || ('Element' in window && value instanceof Element)) return undefined;
                         if (cache.has(value)) {
                             return undefined;
                         }
@@ -3044,6 +3044,8 @@
         let currentMode = localStorage.getItem('m_current_mode') || 'store'; // 'store' or 'admin'
         let currentAdminSection = localStorage.getItem('m_admin_section') || 'dashboard';
         let currentActiveInvoiceId = null;
+        let activeMainCat = 'all';
+        let activeSubCat = 'all';
 
         // --- آلية الدخول للوحة المالك (5 ضغطات متتالية على اسم المؤسسة) ---
         let ownerClickCount = 0;
@@ -3413,7 +3415,7 @@
             if(confirm(`هل أنت تأكد من حذف إعلان/بانر الهيدر المخصص لـ (${key})؟`)) {
                 if(siteSettings && siteSettings.sectionBanners) {
                     delete siteSettings.sectionBanners[key];
-                    localStorage.setItem('m_site_settings', JSON.stringify(siteSettings));
+                    localStorage.setItem('m_site_settings', window.safeStringify(siteSettings));
                     if(window.syncSettingsToCloud) window.syncSettingsToCloud(siteSettings);
                     broadcastSync();
                     applySiteSettings();
@@ -3641,7 +3643,7 @@
 
             if(foundTenant) {
                 currentVendor = foundTenant;
-                localStorage.setItem('m_vendor', JSON.stringify(foundTenant));
+                localStorage.setItem('m_vendor', window.safeStringify(foundTenant));
                 if(errDiv) errDiv.style.display = 'none';
 
                 const modalEl = document.getElementById('vendorAuthModal');
@@ -3673,11 +3675,11 @@
             };
 
             tenants.unshift(newTenant);
-            localStorage.setItem('m_tenants', JSON.stringify(tenants));
+            localStorage.setItem('m_tenants', window.safeStringify(tenants));
             if (window.syncTenantToCloud) window.syncTenantToCloud(newTenant);
 
             currentVendor = newTenant;
-            localStorage.setItem('m_vendor', JSON.stringify(newTenant));
+            localStorage.setItem('m_vendor', window.safeStringify(newTenant));
 
             const modalEl = document.getElementById('vendorAuthModal');
             const modal = bootstrap.Modal.getInstance(modalEl);
@@ -3807,7 +3809,7 @@
                 alert("تم إضافة ونشر المنتج لمتجرك بنجاح بمزامنة سحابية فورية!");
             }
 
-            localStorage.setItem('m_products', JSON.stringify(products));
+            localStorage.setItem('m_products', window.safeStringify(products));
             broadcastSync();
             resetVendorProductForm();
             renderVendorProducts();
@@ -3841,7 +3843,7 @@
         function deleteVendorProduct(prodId) {
             if(confirm("هل أنت تأكد من حذف هذا المنتج من متجرك؟")) {
                 products = products.filter(x => x.id != prodId);
-                localStorage.setItem('m_products', JSON.stringify(products));
+                localStorage.setItem('m_products', window.safeStringify(products));
                 if (window.deleteProductFromCloud) window.deleteProductFromCloud(prodId);
                 broadcastSync();
                 renderVendorProducts();
@@ -3932,7 +3934,7 @@
                 }
             }
 
-            localStorage.setItem('m_categories', JSON.stringify(categories));
+            localStorage.setItem('m_categories', window.safeStringify(categories));
             if (window.syncCategoriesToCloud) window.syncCategoriesToCloud(categories);
             broadcastSync();
             document.getElementById('vMainCatInput').value = '';
@@ -4004,11 +4006,11 @@
             const tIdx = tenants.findIndex(t => t.id === currentVendor.id);
             if(tIdx !== -1) {
                 tenants[tIdx] = { ...tenants[tIdx], ...currentVendor };
-                localStorage.setItem('m_tenants', JSON.stringify(tenants));
+                localStorage.setItem('m_tenants', window.safeStringify(tenants));
                 if (window.syncTenantToCloud) window.syncTenantToCloud(tenants[tIdx]);
             }
 
-            localStorage.setItem('m_vendor', JSON.stringify(currentVendor));
+            localStorage.setItem('m_vendor', window.safeStringify(currentVendor));
             alert("تم حفظ وتحديث بيانات وإعدادات حساب المتجر بنجاح!");
             switchMainMode('vendor');
         }
@@ -4139,7 +4141,7 @@
 
         function toggleTenantStatus(index) {
             tenants[index].status = tenants[index].status === 'active' ? 'suspended' : 'active';
-            localStorage.setItem('m_tenants', JSON.stringify(tenants));
+            localStorage.setItem('m_tenants', window.safeStringify(tenants));
             if (tenants[index] && window.syncTenantToCloud) window.syncTenantToCloud(tenants[index]);
             renderTenantsTable();
         }
@@ -4241,6 +4243,8 @@
 
         // تصفية المنتجات حسب القسم الرئيسي والقسم الفرعي
         function filterByCategories(mainCat, subCat) {
+            activeMainCat = mainCat;
+            activeSubCat = subCat;
             showStoreHome();
             closeSidebarMobile();
             let filtered = getActiveTenantProducts();
@@ -4253,18 +4257,21 @@
             }
 
             const titleEl = document.getElementById('currentCategoryTitle');
-            if(mainCat === 'all') {
-                titleEl.innerHTML = `<i class="fa-solid fa-store text-primary me-1"></i> كافة المنتجات والمعروضات`;
-            } else if(subCat === 'all') {
-                titleEl.innerHTML = `<i class="fa-solid fa-folder-open text-primary me-1"></i> ${mainCat}`;
-            } else {
-                titleEl.innerHTML = `<i class="fa-solid fa-tag text-primary me-1"></i> ${mainCat} > ${subCat}`;
+            if(titleEl) {
+                if(mainCat === 'all') {
+                    titleEl.innerHTML = `<i class="fa-solid fa-store text-primary me-1"></i> كافة المنتجات والمعروضات`;
+                } else if(subCat === 'all') {
+                    titleEl.innerHTML = `<i class="fa-solid fa-folder-open text-primary me-1"></i> ${mainCat}`;
+                } else {
+                    titleEl.innerHTML = `<i class="fa-solid fa-tag text-primary me-1"></i> ${mainCat} > ${subCat}`;
+                }
             }
 
             // عرض شريط البانر المخصص للقسم في الهيدر
             renderSectionHeaderBanner(mainCat, 'storeHeaderBannerArea');
 
             renderPublicProducts(filtered);
+            renderStoreSidebarCategories();
         }
 
         function getProductRating(prod) {
@@ -4592,7 +4599,7 @@
                 date: new Date().toLocaleDateString('ar-EG')
             });
 
-            localStorage.setItem('m_products', JSON.stringify(products));
+            localStorage.setItem('m_products', window.safeStringify(products));
             if (window.syncProductToCloud) window.syncProductToCloud(prod);
             broadcastSync();
 
@@ -4765,7 +4772,7 @@
                         p.category = trimmedName;
                     }
                 });
-                localStorage.setItem('m_products', JSON.stringify(products));
+                localStorage.setItem('m_products', window.safeStringify(products));
 
                 cat.name = trimmedName;
                 saveCategories();
@@ -4790,7 +4797,7 @@
                         p.subCategory = trimmedSubName;
                     }
                 });
-                localStorage.setItem('m_products', JSON.stringify(products));
+                localStorage.setItem('m_products', window.safeStringify(products));
 
                 cat.subCategories[subIndex] = trimmedSubName;
                 saveCategories();
@@ -4820,7 +4827,7 @@
         }
 
         function saveCategories() {
-            localStorage.setItem('m_categories', JSON.stringify(categories));
+            localStorage.setItem('m_categories', window.safeStringify(categories));
             if (window.syncCategoriesToCloud) window.syncCategoriesToCloud(categories);
         }
 
@@ -4930,7 +4937,7 @@
         }
 
         function remCart(i) { cart.splice(i, 1); saveCart(); renderCart(); }
-        function saveCart() { localStorage.setItem('m_cart', JSON.stringify(cart)); }
+        function saveCart() { localStorage.setItem('m_cart', window.safeStringify(cart)); }
         function openCartModal() { 
             renderCart(); 
             const cartModalEl = document.getElementById('cartModal');
@@ -4999,7 +5006,7 @@
             }
 
             currentUser = { name, phone, address };
-            localStorage.setItem('m_user', JSON.stringify(currentUser));
+            localStorage.setItem('m_user', window.safeStringify(currentUser));
             checkUserNav();
 
             const total = cart.reduce((a, b) => a + (b.price * b.qty), 0);
@@ -5009,7 +5016,7 @@
                 id: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
                 date: new Date().toISOString(),
                 customer: { ...currentUser },
-                items: JSON.parse(JSON.stringify(cart)),
+                items: window.safeClone(cart),
                 totalAmount: total,
                 totalCost: totalCost,
                 tenantId: currentTenant ? currentTenant.id : (currentVendor ? currentVendor.id : null),
@@ -5018,7 +5025,7 @@
             };
 
             orders.unshift(newOrder);
-            localStorage.setItem('m_orders', JSON.stringify(orders));
+            localStorage.setItem('m_orders', window.safeStringify(orders));
             broadcastSync();
 
             const storeTitle = currentTenant ? currentTenant.storeName : siteSettings.storeName;
@@ -5309,7 +5316,7 @@ ${itemsTxt}
                 phone: document.getElementById('custPhone').value,
                 address: document.getElementById('custAddress').value
             };
-            localStorage.setItem('m_user', JSON.stringify(currentUser));
+            localStorage.setItem('m_user', window.safeStringify(currentUser));
             checkUserNav();
             renderCustomerInvoicesArchive();
             alert("تم حفظ بيانات حسابك بنجاح.");
@@ -5413,7 +5420,7 @@ ${itemsTxt}
             if(ord) {
                 ord.status = status;
                 if(reason) ord.rejectReason = reason;
-                localStorage.setItem('m_orders', JSON.stringify(orders));
+                localStorage.setItem('m_orders', window.safeStringify(orders));
                 renderAllOrdersTable();
                 calculateKPIs();
             }
@@ -5632,7 +5639,7 @@ ${itemsTxt}
             const found = tenants.find(t => t.id === tenantId);
             if(found) {
                 currentVendor = found;
-                localStorage.setItem('m_vendor', JSON.stringify(found));
+                localStorage.setItem('m_vendor', window.safeStringify(found));
                 switchMainMode('vendor');
             }
         }
@@ -5642,7 +5649,7 @@ ${itemsTxt}
             const newPass = prompt(`تغيير كلمة المرور الخاصة بمتجر (${t.storeName}):`, t.password || '123456');
             if(newPass && newPass.trim() !== '') {
                 tenants[idx].password = newPass.trim();
-                localStorage.setItem('m_tenants', JSON.stringify(tenants));
+                localStorage.setItem('m_tenants', window.safeStringify(tenants));
                 if (window.syncTenantToCloud) window.syncTenantToCloud(tenants[idx]);
                 renderTenantsTable();
                 alert("تم تغيير كلمة السر بنجاح!");
@@ -5653,7 +5660,7 @@ ${itemsTxt}
             if(confirm("هل أنت تأكد من إلغاء وحذف هذا المتجر/المشترك؟")) {
                 const deletedTenantId = tenants[idx] ? tenants[idx].id : null;
                 tenants.splice(idx, 1);
-                localStorage.setItem('m_tenants', JSON.stringify(tenants));
+                localStorage.setItem('m_tenants', window.safeStringify(tenants));
                 if (deletedTenantId && window.deleteTenantFromCloud) window.deleteTenantFromCloud(deletedTenantId);
                 renderTenantsTable();
             }
@@ -5796,7 +5803,7 @@ ${itemsTxt}
                             isCompetitive,
                             images: (finalImages && finalImages.length > 0) ? finalImages : (products[prodIndex].images || ['https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500'])
                         };
-                        localStorage.setItem('m_products', JSON.stringify(products));
+                        localStorage.setItem('m_products', window.safeStringify(products));
                         if (window.syncProductToCloud) window.syncProductToCloud(products[prodIndex]);
                         broadcastSync();
                         alert("تم تعديل بيانات المنتج بنجاح بالمزامنة السحابية!");
@@ -5819,7 +5826,7 @@ ${itemsTxt}
                         images: (finalImages && finalImages.length > 0) ? finalImages : ['https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500']
                     };
                     products.unshift(newProd);
-                    localStorage.setItem('m_products', JSON.stringify(products));
+                    localStorage.setItem('m_products', window.safeStringify(products));
                     if (window.syncProductToCloud) window.syncProductToCloud(newProd);
                     broadcastSync();
                     alert("تم نشر المنتج بنجاح بالمزامنة السحابية الفورية!");
@@ -5921,7 +5928,7 @@ ${itemsTxt}
             if(confirm("هل أنت تأكد من حذف المنتج؟")) {
                 const prodId = products[index] ? products[index].id : null;
                 products.splice(index, 1);
-                localStorage.setItem('m_products', JSON.stringify(products));
+                localStorage.setItem('m_products', window.safeStringify(products));
                 if (prodId && window.deleteProductFromCloud) window.deleteProductFromCloud(prodId);
                 renderAdminProductManage();
                 renderPublicProducts();
@@ -5937,7 +5944,7 @@ ${itemsTxt}
                 adminPhone: document.getElementById('setAdminPhone').value,
                 footerRights: document.getElementById('setFooterRights').value
             };
-            localStorage.setItem('m_site_settings', JSON.stringify(siteSettings));
+            localStorage.setItem('m_site_settings', window.safeStringify(siteSettings));
             if (window.syncSettingsToCloud) window.syncSettingsToCloud(siteSettings);
             applySiteSettings();
             alert("تم تطبيق الإعدادات بنجاح بالمزامنة السحابية!");
