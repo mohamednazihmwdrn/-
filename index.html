@@ -1011,7 +1011,8 @@
                                         <th>الهاتف</th>
                                         <th>كلمة السر</th>
                                         <th>الخطة المختارة</th>
-                                        <th>رابط المتجر المجاني</th>
+                                        <th>رابط المتجر</th>
+                                        <th>الحالة</th>
                                         <th>دخول كتاجر</th>
                                         <th>إجراءات الإدارة</th>
                                     </tr>
@@ -4069,43 +4070,27 @@
             }
         }
 
-        // تسجيل متجر جديد باشتراك شهري (SaaS Registration)
-        function openVendorModal() {
-            new bootstrap.Modal(document.getElementById('vendorSubscriptionModal')).show();
+        function openVendorModal(planFilter) {
+            const modalEl = document.getElementById('vendorAuthModal');
+            if(modalEl) {
+                if(planFilter) {
+                    const planSelect = document.getElementById('vPlan');
+                    if(planSelect) planSelect.value = planFilter;
+                }
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
         }
-
-        document.getElementById('vendorRegisterForm').onsubmit = function(e) {
-            e.preventDefault();
-            const vStoreName = document.getElementById('vStoreName').value.trim();
-            const vOwnerName = document.getElementById('vOwnerName').value.trim();
-            const vPhone = document.getElementById('vPhone').value.trim();
-            const vPlan = document.getElementById('vPlan').value;
-
-            const newTenant = {
-                id: 'TNT-' + Math.floor(100 + Math.random() * 900),
-                storeName: vStoreName,
-                ownerName: vOwnerName,
-                phone: vPhone,
-                plan: vPlan,
-                status: 'active'
-            };
-
-            tenants.push(newTenant);
-            localStorage.setItem('m_tenants', JSON.stringify(tenants));
-
-            // فتح الواتساب لإرسال التجميعة للادارة
-            const msg = `مرحباً، أرغب في إنشاء متجر جديد واشتراك شهري بالمنصة:\n- اسم المتجر: ${vStoreName}\n- المسؤول: ${vOwnerName}\n- الهاتف: ${vPhone}\n- الخطة: ${vPlan}`;
-            sendWhatsAppMessage(siteSettings.adminPhone, msg);
-
-            bootstrap.Modal.getInstance(document.getElementById('vendorSubscriptionModal')).hide();
-            alert("تم إرسال طلب إنشاء متجرك بنجاح! سيتم التواصل معك لتأكيد تفعيل اللوحة.");
-            renderTenantsTable();
-        };
 
         function renderTenantsTable() {
             const tbody = document.getElementById('tenantsTableBody');
             if(!tbody) return;
             tbody.innerHTML = '';
+
+            if(!tenants || tenants.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted py-3">لا يوجد تجار أو مشتركون مسجلون حالياً.</td></tr>`;
+                return;
+            }
 
             const baseUrl = window.location.origin + window.location.pathname;
 
@@ -4116,17 +4101,36 @@
                         <td><strong>${t.storeName}</strong><br><small class="text-muted">ID: ${t.id}</small></td>
                         <td>${t.ownerName}</td>
                         <td>${t.phone}</td>
+                        <td><code class="bg-light px-2 py-1 border rounded fw-bold text-dark">${t.password || '123456'}</code></td>
                         <td><span class="badge bg-info text-dark">${t.plan}</span></td>
                         <td>
-                            <a href="${tenantLink}" target="_blank" class="btn btn-sm btn-outline-primary py-0" title="فتح متجر الشريك">
-                                <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> رابط المتجر
-                            </a>
+                            <div class="d-flex gap-1 align-items-center">
+                                <a href="${tenantLink}" target="_blank" class="btn btn-sm btn-outline-primary py-0" title="فتح متجر الشريك">
+                                    <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> فتح
+                                </a>
+                                <button class="btn btn-sm btn-outline-secondary py-0" onclick="copyTenantLink('${t.id}')" title="نسخ رابط المتجر">
+                                    <i class="fa-solid fa-copy"></i>
+                                </button>
+                            </div>
                         </td>
                         <td><span class="badge ${t.status === 'active' ? 'bg-success' : 'bg-danger'}">${t.status === 'active' ? 'نشط' : 'موقوف'}</span></td>
                         <td>
-                            <button class="btn btn-sm ${t.status === 'active' ? 'btn-outline-danger' : 'btn-outline-success'} py-0" onclick="toggleTenantStatus(${i})">
-                                ${t.status === 'active' ? 'إيقاف' : 'تفعيل'}
+                            <button class="btn btn-sm btn-success py-0 fw-bold" onclick="loginAsVendorDirect('${t.id}')" title="دخول مباشر لوحة تحكم المتجر">
+                                <i class="fa-solid fa-right-to-bracket me-1"></i> دخول كتاجر
                             </button>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-sm ${t.status === 'active' ? 'btn-outline-warning' : 'btn-outline-success'} py-0" onclick="toggleTenantStatus(${i})" title="تفعيل أو إيقاف المتجر">
+                                    ${t.status === 'active' ? 'إيقاف' : 'تفعيل'}
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary py-0" onclick="resetTenantPassword(${i})" title="تغيير كلمة السر">
+                                    <i class="fa-solid fa-key"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteTenant(${i})" title="حذف المتجر">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -4136,6 +4140,7 @@
         function toggleTenantStatus(index) {
             tenants[index].status = tenants[index].status === 'active' ? 'suspended' : 'active';
             localStorage.setItem('m_tenants', JSON.stringify(tenants));
+            if (tenants[index] && window.syncTenantToCloud) window.syncTenantToCloud(tenants[index]);
             renderTenantsTable();
         }
 
@@ -4160,12 +4165,14 @@
                     : [];
 
                 const safeMainCat = String(cat.name).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const isCatActive = (activeMainCat === cat.name);
 
                 // إذا لم توجد أقسام فرعية: عرض زر عادي مباشر بدون زر تمدد (Accordion) وبدون سهم فارغ
                 if (subs.length === 0) {
+                    const isSelected = (activeMainCat === cat.name && activeSubCat === 'all');
                     container.innerHTML += `
                         <div class="mb-1">
-                            <button type="button" class="sidebar-menu-btn text-dark fw-bold w-100 border-0 bg-light rounded py-2 px-3 text-start d-flex align-items-center justify-content-between" onclick="filterByCategories('${safeMainCat}', 'all')">
+                            <button type="button" class="sidebar-menu-btn ${isSelected ? 'active text-primary fw-bold bg-primary-subtle' : 'text-dark fw-bold'} w-100 border-0 rounded py-2 px-3 text-start d-flex align-items-center justify-content-between" onclick="filterByCategories('${safeMainCat}', 'all')">
                                 <span class="d-flex align-items-center gap-2">
                                     <i class="fa-solid fa-folder text-warning me-1"></i> ${cat.name}
                                 </span>
@@ -4175,33 +4182,56 @@
                     return;
                 }
 
-                // إذا توجد أقسام فرعية: إنشاء زر التمدد القابل للفتح والإغلاق
+                // إذا توجد أقسام فرعية: إنشاء قائمة الأقسام الفرعية بوضوح عالي
                 let subHtml = '';
                 subs.forEach(sub => {
                     const subLabel = (typeof sub === 'object' && sub !== null) ? (sub.name || sub.title || String(sub)) : String(sub);
                     const safeSub = String(subLabel).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const isSubActive = (activeMainCat === cat.name && activeSubCat === subLabel);
                     
                     subHtml += `
-                        <a href="javascript:void(0)" class="sub-cat-btn d-flex align-items-center justify-content-between text-dark fw-semibold text-decoration-none py-2 px-2 mb-1 rounded" onclick="filterByCategories('${safeMainCat}', '${safeSub}')">
-                            <span class="d-flex align-items-center gap-2"><i class="fa-solid fa-angle-left text-primary small"></i> ${subLabel}</span>
+                        <a href="javascript:void(0)" 
+                           class="sub-cat-btn d-flex align-items-center justify-content-between text-decoration-none py-2 px-3 mb-1 rounded ${isSubActive ? 'bg-primary text-white fw-bold shadow-sm' : 'text-dark fw-semibold bg-white border-start border-3 border-primary hover-bg-light'}" 
+                           onclick="event.stopPropagation(); filterByCategories('${safeMainCat}', '${safeSub}')" style="transition: all 0.2s;">
+                            <span class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-angle-left ${isSubActive ? 'text-white' : 'text-primary'} small"></i> 
+                                ${subLabel}
+                            </span>
+                            <span class="badge ${isSubActive ? 'bg-light text-primary' : 'bg-primary-subtle text-primary'} rounded-pill" style="font-size:0.7rem;">فرعي</span>
                         </a>
                     `;
                 });
 
+                // تكون الشجرة مفتوحة تلقائياً إذا كان هذا القسم مختاراً أو إذا كان القسم الأول
+                const shouldExpand = isCatActive || (index === 0 && activeMainCat === 'all');
+
                 container.innerHTML += `
-                    <div class="accordion-item border-0 mb-1 rounded overflow-hidden">
+                    <div class="accordion-item border-0 mb-2 rounded overflow-hidden shadow-sm">
                         <h2 class="accordion-header" id="headingCat${index}">
-                            <button class="accordion-button collapsed py-2 px-3 fw-bold fs-6 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCat${index}" aria-expanded="false" aria-controls="collapseCat${index}">
-                                <i class="fa-solid fa-folder text-warning me-2"></i> ${cat.name}
-                                <span class="badge bg-primary-subtle text-primary ms-auto me-1" style="font-size:0.75rem;">${subs.length}</span>
+                            <button class="accordion-button ${shouldExpand ? '' : 'collapsed'} py-2 px-3 fw-bold fs-6 shadow-none d-flex align-items-center justify-content-between" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#collapseCat${index}" 
+                                    aria-expanded="${shouldExpand ? 'true' : 'false'}" 
+                                    aria-controls="collapseCat${index}"
+                                    onclick="filterByCategories('${safeMainCat}', 'all')">
+                                <span class="d-flex align-items-center">
+                                    <i class="fa-solid fa-folder-open text-warning me-2 fs-6"></i> ${cat.name}
+                                </span>
+                                <span class="badge bg-primary text-white ms-2 px-2 py-1 rounded-pill" style="font-size:0.75rem;" title="${subs.length} أقسام فرعية">${subs.length} فرعي</span>
                             </button>
                         </h2>
-                        <div id="collapseCat${index}" class="accordion-collapse collapse" aria-labelledby="headingCat${index}" data-bs-parent="#storeCategoriesAccordion">
+                        <div id="collapseCat${index}" class="accordion-collapse collapse ${shouldExpand ? 'show' : ''}" aria-labelledby="headingCat${index}" data-bs-parent="#storeCategoriesAccordion">
                             <div class="accordion-body p-2 bg-light rounded-bottom border-top">
-                                <a href="javascript:void(0)" class="sub-cat-btn fw-bold text-primary mb-1 pb-2 border-bottom d-flex align-items-center justify-content-between text-decoration-none" onclick="filterByCategories('${safeMainCat}', 'all')">
-                                    <span>📌 كل منتجات (${cat.name})</span>
+                                <a href="javascript:void(0)" 
+                                   class="sub-cat-btn fw-bold ${activeMainCat === cat.name && activeSubCat === 'all' ? 'text-primary bg-white shadow-sm' : 'text-secondary'} mb-2 pb-2 border-bottom d-flex align-items-center justify-content-between text-decoration-none px-2 py-1 rounded" 
+                                   onclick="filterByCategories('${safeMainCat}', 'all')">
+                                    <span><i class="fa-solid fa-layer-group me-1 text-primary"></i> كل منتجات (${cat.name})</span>
+                                    <i class="fa-solid fa-arrow-left small"></i>
                                 </a>
-                                ${subHtml}
+                                <div class="d-flex flex-column gap-1">
+                                    ${subHtml}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -5586,42 +5616,6 @@ ${itemsTxt}
                         <td><span class="badge bg-warning text-dark">${ord.status}</span></td>
                         <td>${ord.rejectReason || 'لم يحدد'}</td>
                         <td><button class="btn btn-sm btn-outline-danger py-0" onclick="viewOrderReport('${ord.id}')">تقرير</button>
-                    </tr>
-                `;
-            });
-        }
-
-        // Render Tenants Table in Super Admin Dashboard
-        function renderTenantsTable() {
-            const tbody = document.getElementById('tenantsTableBody');
-            if(!tbody) return;
-
-            tbody.innerHTML = '';
-            if(tenants.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">لا يوجد تجار أو مشتركون حالياً.</td></tr>`;
-                return;
-            }
-
-            tenants.forEach((t, idx) => {
-                const storeUrl = `${window.location.origin}${window.location.pathname}?tenant=${t.id}`;
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${t.storeName}</strong><br><small class="text-muted">ID: ${t.id}</small></td>
-                        <td>${t.ownerName}</td>
-                        <td>${t.phone}</td>
-                        <td><code class="bg-light px-2 py-1 border rounded fw-bold text-dark">${t.password || '123456'}</code></td>
-                        <td><span class="badge bg-primary">${t.plan}</span></td>
-                        <td>
-                            <a href="${storeUrl}" target="_blank" class="btn btn-sm btn-outline-info py-0 me-1" title="رابط المتجر الخاص"><i class="fa-solid fa-arrow-up-right-from-square"></i> الرابط</a>
-                            <button class="btn btn-sm btn-outline-secondary py-0" onclick="copyTenantLink('${t.id}')" title="نسخ الرابط"><i class="fa-solid fa-copy"></i></button>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-success fw-bold py-0" onclick="loginAsVendorDirect('${t.id}')"><i class="fa-solid fa-right-to-bracket me-1"></i> دخول كتاجر</button>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-warning py-0 me-1 fw-bold" onclick="resetTenantPassword(${idx})"><i class="fa-solid fa-key"></i> كلمة السر</button>
-                            <button class="btn btn-sm btn-danger py-0 fw-bold" onclick="deleteTenant(${idx})"><i class="fa-solid fa-trash"></i></button>
-                        </td>
                     </tr>
                 `;
             });
